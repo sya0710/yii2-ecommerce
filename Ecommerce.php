@@ -4,6 +4,7 @@ namespace sya\ecommerce;
 
 use Yii;
 use yii\bootstrap\Html;
+use yii\helpers\ArrayHelper;
 
 class Ecommerce extends \yii\base\Widget {
     
@@ -18,63 +19,47 @@ class Ecommerce extends \yii\base\Widget {
     public $layout = "{statistic}\n{charts}\n{items}";
     
     /**
-     * @var string The template for rendering the statistic ecommerce within a statistic. 
-     * The following special variables are recognized and will be replaced:
-     * - {items}: string, render item statistic
-     */
-    public $statisticTemplate = "{itemsStatistic}";
-    
-    /**
      * @var string The template for rendering the item statistic ecommerce within a statistic.
-     * The following special variables are recognized and will be replaced:
-     * - {statisticHeader}: string, render header statistic
-     * - {statisticContent}: string, render content statistic
      */
-    public $itemStatistic = <<< HTML
-        <div class="col-lg-3">
-            <div class="ibox float-e-margins">
-                {statisticHeader}
-                {statisticContent}
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox float-e-margins">
-                {statisticHeader}
-                {statisticContent}
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox float-e-margins">
-                {statisticHeader}
-                {statisticContent}
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="ibox float-e-margins">
-                {statisticHeader}
-                {statisticContent}
-            </div>
-        </div>
-HTML;
+    public $itemStatistic = "{statisticContent}";
     
     /**
-     * @var string The template for rendering the header statistic ecommerce within a statistic.
+     * @var array The multi column of statistic
+     * $statisticColumns = [
+     *      [
+    *           'header' => '',
+    *           'smallHeader' => '',
+    *           'time' => '',
+    *           'percent' => '',
+    *           'totalStatistic' => ''
+     *      ],
+     *      [
+    *           'header' => '',
+    *           'smallHeader' => '',
+    *           'time' => '',
+    *           'percent' => '',
+    *           'totalStatistic' => ''
+     *      ],
+     * ]
      */
-    public $statisticHeader = <<< HTML
-        <div class="ibox-title">
-            <span class="label label-success pull-right">Monthly</span>
-            <h5>Income</h5>
-        </div>
-HTML;
+    public $statisticColumns = [];
     
     /**
-     * @var string The template for rendering the content statistic ecommerce within a statistic.
+     * @var string The template for rendering the statistic ecommerce within a statistic.
+     * - {header}: title box statistic.
+     * - {time}: time of box statistic.
      */
-    public $statisticContent = <<< HTML
-        <div class="ibox-content">
-            <h1 class="no-margins">40 886,200</h1>
-            <div class="stat-percent font-bold text-success">98% </div>
-            <small>Total income</small>
+    public $statisticTemplate = <<< HTML
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                {time}
+                {header}
+            </div>
+            <div class="ibox-content">
+                {totalStatistic}
+                {percent}
+                {smallHeader}
+            </div>
         </div>
 HTML;
     
@@ -177,8 +162,8 @@ HTML;
         switch ($name) {
             case '{items}':
                 return $this->renderItems();
-            case '{itemsStatistic}':
-                return $this->renderItemsStatistic();
+            case '{statisticContent}':
+                return $this->renderStatisticContent();
             default:
                 return false;
         }
@@ -189,29 +174,9 @@ HTML;
      * @return string
      */
     public function renderStatistic(){
-        $content = Html::tag('div', $this->statisticTemplate, $this->statisticOptions);
+        $content = Html::tag('div', $this->itemStatistic, $this->statisticOptions);
         
         return $content;
-    }
-    
-    /**
-     * Render box item statistic
-     * @return string
-     */
-    public function renderItemsStatistic(){
-        $replace['{statisticHeader}'] = $this->renderStatisticHeader();
-        $replace['{statisticContent}'] = $this->renderStatisticContent();
-        
-        $this->itemStatistic = strtr($this->itemStatistic, $replace);
-        return $this->itemStatistic;
-    }
-    
-    /**
-     * Return statistic header
-     * @return string
-     */
-    public function renderStatisticHeader(){
-        return $this->statisticHeader;
     }
     
     /**
@@ -219,7 +184,68 @@ HTML;
      * @return string
      */
     public function renderStatisticContent(){
-        return $this->statisticContent;
+        $content = '';
+        if (!empty($this->statisticColumns) && is_array($this->statisticColumns)){
+            $numberColumn = count($this->statisticColumns);
+            foreach ($this->statisticColumns as $column) {
+                $header = ArrayHelper::getValue($column, 'header', 'Orders');
+                $time = ArrayHelper::getValue($column, 'time', 'Annual');
+                $percent = ArrayHelper::getValue($column, 'percent', '85%');
+                $totalStatistic = ArrayHelper::getValue($column, 'totalStatistic', '40 886,200');
+                $smallHeader = ArrayHelper::getValue($column, 'smallHeader', 'New orders');
+
+                // Options element in statistic
+                $headerOptions = ArrayHelper::getValue($column, 'headerOptions', []);
+                $timeOptions = ArrayHelper::getValue($column, 'timeOptions', []);
+                $percentOptions = ArrayHelper::getValue($column, 'percentOptions', []);
+                $totalStatisticOptions = ArrayHelper::getValue($column, 'totalStatisticOptions', []);
+                $smallHeaderOptions = ArrayHelper::getValue($column, 'smallHeaderOptions', []);
+
+                // Replace input
+                if ($header !== false){
+                    Html::addCssClass($headerOptions, '');
+                    $header = Html::tag('h5', $header, $headerOptions);
+                }
+
+                if ($time !== false){
+                    if (empty($timeOptions['class']))
+                        $timeOptions['class'] = 'label-success';
+                    
+                    Html::addCssClass($timeOptions, 'label pull-right');
+                    $time = Html::tag('span', $time, $timeOptions);
+                }
+
+                if ($percent !== false){
+                    Html::addCssClass($percentOptions, 'stat-percent font-bold text-success');
+                    $percent = Html::tag('div', $percent, $percentOptions);
+                }
+
+                if ($totalStatistic !== false){
+                    Html::addCssClass($totalStatisticOptions, 'no-margins');
+                    $totalStatistic = Html::tag('h1', $totalStatistic, $totalStatisticOptions);
+                }
+
+                if ($smallHeader !== false){
+                    Html::addCssClass($smallHeaderOptions, '');
+                    $smallHeader = Html::tag('small', $smallHeader, $smallHeaderOptions);
+                }
+                
+                $statistic = strtr(
+                    $this->statisticTemplate,
+                    [
+                        '{header}' => $header,
+                        '{time}' => $time,
+                        '{totalStatistic}' => $totalStatistic,
+                        '{percent}' => $percent,
+                        '{smallHeader}' => $smallHeader,
+                    ]
+                );
+                
+                $content .= Html::tag('div', $statistic, ['class' => 'col-lg-' . (round(12/$numberColumn))]);
+            }
+        }
+        
+        return $content;
     }
     
     /**

@@ -24,7 +24,31 @@ use sya\gallery\Module;
 
 ```php
 use sya\ecommerce\Ecommerce;
-echo Ecommerce::widget();
+echo Ecommerce::widget([
+    'statisticColumns' => [
+        [
+            'header' => 'New Orders',
+        ],
+        [
+            'header' => 'New Orders',
+        ],
+        [
+            'header' => 'Orders',
+            'timeOptions' => [
+                'class' => 'label-info'
+            ],
+            'totalStatistic' => '275,800'
+        ],
+        [
+            'header' => 'Income',
+            'smallHeader' => 'In first month',
+            'time' => 'Low value',
+            'timeOptions' => [
+                'class' => 'label-danger'
+            ]
+        ],
+    ]
+]);
 ```
 
 ## License
