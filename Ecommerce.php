@@ -5,6 +5,7 @@ namespace sya\ecommerce;
 use Yii;
 use yii\bootstrap\Html;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 class Ecommerce extends \yii\base\Widget {
     
@@ -16,7 +17,7 @@ class Ecommerce extends \yii\base\Widget {
      * - {search}: string, render search order template
      * - {items}: string, render item order.
      */
-    public $layout = "{statistic}\n{charts}\n{items}";
+    public $layout = "{statistic}\n{items}";
     
     /**
      * @var string The template for rendering the item statistic ecommerce within a statistic.
@@ -71,9 +72,26 @@ HTML;
     public $realtime = false;
     
     /**
+     * @var boolean The gridview run pjax
+     * Defaults to `false`.
+     */
+    public $pjax = false;
+    
+    /**
      * @var array the HTML attributes for the items element
      */
     public $itemOptions = [];
+    
+    /**
+     * @var array setting item
+     * $itemSettings = [
+     *      // Namespace in gridview
+     *      'namespaceGridview' => '\kartik\grid\GridView',
+     *      'dataProvider' => $dataProvider,
+     *      'searchModel' => $searchModel,
+     * ];
+     */
+    public $itemSettings = [];
     
     /**
      * @var array the HTML attributes for the statistic element
@@ -217,7 +235,7 @@ HTML;
 
                 if ($percent !== false){
                     Html::addCssClass($percentOptions, 'stat-percent font-bold text-success');
-                    $percent = Html::tag('div', $percent, $percentOptions);
+                    $percent = Html::tag('div', $percent . ' <i class="fa fa-bolt"></i>', $percentOptions);
                 }
 
                 if ($totalStatistic !== false){
@@ -269,7 +287,54 @@ HTML;
      * @return string
      */
     public function renderItems(){
-        return "items";
+        // Declare default value properties itemSettings.
+        $namespaceGridview = ArrayHelper::getValue($this->itemSettings, 'namespaceGridview', '\kartik\grid\GridView');
+        $panel = ArrayHelper::getValue($this->itemSettings, 'panel', [
+            'heading' => Yii::t('ecommerce', 'Order'),
+        ]);
+        
+        // If empty($dataProvider), empty($searchModel) then set default $dataProvider, $searchModel.
+        $dataProvider = ArrayHelper::getValue($this->itemSettings, 'dataProvider', '');
+        $searchModel = ArrayHelper::getValue($this->itemSettings, 'searchModel', '');
+        
+        if (empty($searchModel)) {
+            $searchModel = new models\Order;
+            $searchModel->scenario = 'search';
+        }
+        
+        if (empty($dataProvider)) {
+            $queryParams = Yii::$app->request->getQueryParams();
+            $dataProvider = $searchModel->search($queryParams);
+        }
+        
+        $columns = ArrayHelper::getValue($this->itemSettings, 'columns', [
+            [
+                'class'=>'kartik\grid\SerialColumn',
+                'contentOptions'=>['class'=>'kartik-sheet-style'],
+                'width'=>'36px',
+                'header'=>'',
+                'headerOptions'=>['class'=>'kartik-sheet-style']
+            ],
+            '_id',
+            'creator',
+            'created_at',
+            'status',
+            'note'
+        ]);
+        $button = Html::a(Yii::t('ecommerce', 'Create'). ' ' .Yii::t('ecommerce', 'Order'), Url::to(['create']) , [
+            'class' => 'btn btn-info',
+            'style' => 'margin-bottom: 10px;',
+        ]);
+        
+        return $button . $namespaceGridview::widget([
+            'panel' => $panel,
+            'pjax' => $this->pjax,
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => $columns,
+            'responsive' => true,
+            'hover' => true,
+        ]);
     }
     
     private function registerAssets(){
