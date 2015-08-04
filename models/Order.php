@@ -4,6 +4,7 @@ namespace sya\ecommerce\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\Url;
 
 /**
  * This is the model class for collection "order".
@@ -32,6 +33,40 @@ use yii\base\Model;
  */
 class Order extends BaseOrder
 {
+    // Status
+    CONST STATUS_ACTIVE = 'Hiện';
+    CONST STATUS_INACTIVE = 'Ẩn';
+    
+    // Action in ecommerce
+    CONST ACTION_INDEX = 'index';
+    CONST ACTION_DELETE = 'delete';
+    CONST ACTION_UPDATE = 'update';
+    CONST ACTION_CREATE = 'create';
+    
+    // Conllection name
+    public static $collectionName = 'order';
+    
+    /**
+     * @inheritdoc
+     */
+    public static function collectionName()
+    {
+        return self::$collectionName;
+    }
+    
+    /**
+     * @return array Build action default in ecommerce
+     */
+    public static function buildActions(){
+        return [
+            self::ACTION_CREATE => Url::to(['/ecommerce/base/create']),
+            self::ACTION_INDEX => Url::to(['/ecommerce/base/index']),
+            self::ACTION_UPDATE => Url::to(['/ecommerce/base/update']),
+            self::ACTION_DELETE => Url::to(['/ecommerce/base/delete']),
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */

@@ -19,7 +19,7 @@ use Yii;
  * @property mixed $payment
  * @property mixed $note
  */
-class BaseOrder extends \yii\mongodb\ActiveRecord
+class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
 {
     /**
      * @inheritdoc

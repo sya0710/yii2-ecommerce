@@ -6,6 +6,7 @@ use Yii;
 use yii\bootstrap\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use sya\ecommerce\models\Order;
 
 class Ecommerce extends \yii\base\Widget {
     
@@ -89,6 +90,12 @@ HTML;
      *      'namespaceGridview' => '\kartik\grid\GridView',
      *      'dataProvider' => $dataProvider,
      *      'searchModel' => $searchModel,
+     *      'actions' => [
+     *         'create' => Url::to(['/ecommerce/base/create']),
+     *         'index' => Url::to(['/ecommerce/base/index']),
+     *         'update' => Url::to(['/ecommerce/base/update']),
+     *         'delete' => Url::to(['/ecommerce/base/delete']),
+     *      ]
      * ];
      */
     public $itemSettings = [];
@@ -297,16 +304,10 @@ HTML;
         $dataProvider = ArrayHelper::getValue($this->itemSettings, 'dataProvider', '');
         $searchModel = ArrayHelper::getValue($this->itemSettings, 'searchModel', '');
         
-        if (empty($searchModel)) {
-            $searchModel = new models\Order;
-            $searchModel->scenario = 'search';
-        }
+        // Controller action in ecommerce
+        $actions = ArrayHelper::getValue($this->itemSettings, 'actions', Order::buildActions());
         
-        if (empty($dataProvider)) {
-            $queryParams = Yii::$app->request->getQueryParams();
-            $dataProvider = $searchModel->search($queryParams);
-        }
-        
+        // Build default columns
         $columns = ArrayHelper::getValue($this->itemSettings, 'columns', [
             [
                 'class'=>'kartik\grid\SerialColumn',
@@ -317,11 +318,44 @@ HTML;
             ],
             '_id',
             'creator',
-            'created_at',
-            'status',
-            'note'
+            [
+                'attribute'=>'created_at',
+                'filterType'=>$namespaceGridview::FILTER_DATE_RANGE,
+                'format'=>'raw',
+                'width'=>'270px',
+                'hAlign'=>'center',
+                'vAlign'=>'middle',
+                'filterWidgetOptions'=>[
+                    'pluginOptions'=>[
+                        'format'=>'Y-m-d',
+                        'separator' => ' to ',
+                        'opens'=>'left'
+                    ],
+                    'presetDropdown'=>true,
+                    'hideInput'=>true,
+                    'convertFormat'=>true,
+                ],
+                'value'=>function ($model, $key, $index, $widget) { 
+                    return date('d-m-Y', $model->created_at->sec);
+                },
+            ],
+            [
+                'class'=>'kartik\grid\BooleanColumn',
+                'attribute'=>'status', 
+                'vAlign'=>'middle',
+                'format'=>'raw',
+                'trueLabel' => Order::STATUS_ACTIVE,
+                'falseLabel' => Order::STATUS_INACTIVE,
+            ],
+            'note',
+            [
+                'class'=>'kartik\grid\ActionColumn',
+                'urlCreator'=>function($action, $model, $key, $index) { return Url::to(['delete','id'=>$model->_id]); },
+                'template' => '{delete}',
+            ]
         ]);
-        $button = Html::a(Yii::t('ecommerce', 'Create'). ' ' .Yii::t('ecommerce', 'Order'), Url::to(['create']) , [
+        
+        $button = Html::a(Yii::t('ecommerce', 'Create'). ' ' .Yii::t('ecommerce', 'Order'), $actions[Order::ACTION_CREATE] , [
             'class' => 'btn btn-info',
             'style' => 'margin-bottom: 10px;',
         ]);
