@@ -1,0 +1,22 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 5, 2015, 9:12:06 AM
+    Author     : sya
+*/
+
+#nestable-menu {padding: 0; margin: 10px 0 20px 0;}
+.ibox {clear: both; margin-bottom: 25px; margin-top: 0; padding: 0;}
+.ibox-title {-moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-right-colors: none; -moz-border-top-colors: none; background-color: #ffffff; border-color: #e7eaec; border-image: none; border-style: solid solid none; border-width: 4px 0px 0; color: inherit; margin-bottom: 0; padding: 14px 15px 7px; min-height: 48px;}
+.ibox-content {clear: both; background-color: #ffffff; color: inherit; padding: 15px 20px 20px 20px; border-color: #e7eaec; border-image: none; border-style: solid solid none; border-width: 1px 0px;}
+.ibox-tools {display: inline-block; float: right; margin-top: 0; position: relative; padding: 0;}
+.selected {background-color: #DEDEDE !important;}
+.text-vertical {text-align: left; vertical-align: middle !important;}
+.timeline-item .date {text-align: right; width: 110px; position: relative; padding-top: 30px;}
+.text-navy {color: #1ab394;}
+.timeline-item .content {border-left: 1px solid #e7eaec; border-top: 1px solid #e7eaec; padding-top: 10px; min-height: 100px;}
+.no-top-border {border-top: 0 !important;}
+.m-b-xs {margin-bottom: 5px;}
