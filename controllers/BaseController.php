@@ -4,12 +4,10 @@ namespace sya\ecommerce\controllers;
 
 use Yii;
 use yii\web\NotFoundHttpException;
+use sya\ecommerce\Ecommerce;
 use yii\helpers\ArrayHelper;
 
 class BaseController extends \yii\web\Controller{
-    
-    // namespace of model use
-    public $namespaceModel = '\sya\ecommerce\models\Order';
     
     public function actionIndex(){
         $assign = $this->getDataProvider();
@@ -23,19 +21,70 @@ class BaseController extends \yii\web\Controller{
     
     public function actionCreate(){
         // Get namespace of model
-        $namespaceModel = $this->namespaceModel;
+        $ecommerce = Ecommerce::module();
+        // Check have exists product module namespace
+        if (!empty($ecommerce->productModule)){
+            $queryParams = Yii::$app->request->getQueryParams();
+            $productSearchModel = new $ecommerce->productModule;
+            $productSearchModel->scenario = 'search';
+            $productDataProvider = $productSearchModel->search($queryParams);
+        } else {
+            throw new \yii\base\Exception('Module products that have not been declared.', '500');
+        }
         
-        $model = new $namespaceModel;
+        // Order module load
+        $model = new $ecommerce->itemModule;
         $model->scenario = 'create';
         
         if ($model->load(Yii::$app->request->post()) AND $model->save()){
-            $this->redirect([ArrayHelper::getValue($namespaceModel::buildActions(), $namespaceModel::ACTION_INDEX), 'id' => $model->_id]);
+            $this->redirect(['index', 'id' => $model->_id]);
         }
         
-        Yii::$app->view->title = Yii::t('common', 'Create') . ' ' . Yii::t($this->module->id, 'Product');
-        Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::t($this->module->id, 'Product')];
+        Yii::$app->view->title = Yii::t($this->module->id, 'Create') . ' ' . Yii::t($this->module->id, 'Order');
+        Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::t($this->module->id, 'Order'), 'url' => ['index']];
+        Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::$app->view->title];
         
-        return $this->render('form', ['model' => $model]);
+        return $this->render('@vendor/sya/yii2-ecommerce/views/base/form', [
+            'model' => $model,
+            'productSearchModel' => $productSearchModel,
+            'productDataProvider' => $productDataProvider,
+            'productColumns' => $ecommerce->productColumns,
+            'template' => $model->generateProductOrder()
+        ]);
+    }
+    
+    public function actionUpdate($id){
+        // Get namespace of model
+        $ecommerce = Ecommerce::module();
+        // Check have exists product module namespace
+        if (!empty($ecommerce->productModule)){
+            $queryParams = Yii::$app->request->getQueryParams();
+            $productSearchModel = new $ecommerce->productModule;
+            $productSearchModel->scenario = 'search';
+            $productDataProvider = $productSearchModel->search($queryParams);
+        } else {
+            throw new \yii\base\Exception('Module products that have not been declared.', '500');
+        }
+        
+        // Order module load
+        $model = $this->findModel($id);
+        $model->scenario = 'create';
+        
+        if ($model->load(Yii::$app->request->post()) AND $model->save()){
+            $this->redirect(['index', 'id' => $model->_id]);
+        }
+        
+        Yii::$app->view->title = Yii::t($this->module->id, 'Update') . ' ' . Yii::t($this->module->id, 'Order') . ': ' . $model->ecommerce_id;
+        Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::t($this->module->id, 'Order'), 'url' => ['index']];
+        Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::$app->view->title];
+        
+        return $this->render('@vendor/sya/yii2-ecommerce/views/base/form', [
+            'model' => $model,
+            'productSearchModel' => $productSearchModel,
+            'productDataProvider' => $productDataProvider,
+            'productColumns' => $ecommerce->productColumns,
+            'template' => $model->generateProductOrder($model->product)
+        ]);
     }
     
     /**
@@ -44,14 +93,12 @@ class BaseController extends \yii\web\Controller{
      * @param string $id
      * @return mixed
      */
-    public function actionDelete($id)
-    {
-        // Get namespace of model
-        $namespaceModel = $this->namespaceModel;
+    public function actionDelete($id){
+        $model = $this->findModel($id);
+        $model->status = '';
+        $model->save();
         
-        $this->findModel($id)->delete();
-        
-        return $this->redirect([ArrayHelper::getValue($namespaceModel::buildActions(), $namespaceModel::ACTION_INDEX)]);
+        return $this->redirect(['index']);
     }
     
     /**
@@ -60,7 +107,8 @@ class BaseController extends \yii\web\Controller{
      */
     protected function getDataProvider(){
         $queryParams = Yii::$app->request->getQueryParams();
-        $searchModel = new $this->namespaceModel;
+        $ecommerce = Ecommerce::module();
+        $searchModel = new $ecommerce->itemModule;
         $searchModel->scenario = 'search';
         $dataProvider = $searchModel->search($queryParams);
         
@@ -77,10 +125,10 @@ class BaseController extends \yii\web\Controller{
      * @return the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id){
         // Get namespace of model
-        $namespaceModel = $this->namespaceModel;
+        $ecommerce = Ecommerce::module();
+        $namespaceModel = $ecommerce->itemModule;
         
         if (($model = $namespaceModel::findOne($id)) !== null) {
             return $model;

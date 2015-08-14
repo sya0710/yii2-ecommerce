@@ -12,12 +12,13 @@ use Yii;
  * @property mixed $creator
  * @property mixed $created_at
  * @property mixed $updater
- * @property mixed $updated_time
+ * @property mixed $updated_at
  * @property mixed $status
  * @property mixed $product
  * @property mixed $customer
  * @property mixed $payment
  * @property mixed $note
+ * @property mixed $log
  */
 class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
 {
@@ -46,6 +47,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'customer',
             'payment',
             'note',
+            'log',
         ];
     }
 
@@ -55,7 +57,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
     public function rules()
     {
         return [
-            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note'], 'safe']
+            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note', 'log'], 'safe']
         ];
     }
 
@@ -76,6 +78,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'customer' => Yii::t('ecommerce', 'Customer'),
             'payment' => Yii::t('ecommerce', 'Payment'),
             'note' => Yii::t('ecommerce', 'Note'),
+            'log' => Yii::t('ecommerce', 'Log'),
         ];
     }
 }

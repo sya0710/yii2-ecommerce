@@ -6,7 +6,7 @@ use Yii;
 use yii\bootstrap\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use sya\ecommerce\models\Order;
+use sya\ecommerce\Module;
 
 class Ecommerce extends \yii\base\Widget {
     
@@ -114,6 +114,65 @@ HTML;
      * @var array the HTML attribtes for the charts element
      */
     public $chartsOptions = [];
+    
+    /**
+     * Gets the module
+     *
+     * @param string $m the module name
+     *
+     * @return Module
+     */
+    public static function getModule($m)
+    {
+        $mod = Yii::$app->controller->module;
+        return $mod && $mod->getModule($m) ? $mod->getModule($m) : Yii::$app->getModule($m);
+    }
+    
+    /**
+     * Returns the ecommerce module
+     *
+     * @return Module
+     */
+    public static function module()
+    {
+        return self::getModule(Module::MODULE);
+    }
+
+    /**
+     * Generates the configuration for the widget based on
+     * module level defaults
+     *
+     * @param array $config the widget configuration
+     *
+     * @throws InvalidConfigException
+     * @return array
+     */
+    public static function getConfig($config = [])
+    {
+        $module = self::module();
+        if (!empty($module->itemSettings)) {
+            $config = array_replace_recursive($module->itemSettings, $config);
+        }
+        return $config;
+    }
+
+    /**
+     * @inherit doc
+     */
+    public static function begin($config = [])
+    {
+        $config = self::getConfig($config);
+        return parent::begin($config);
+    }
+
+    /**
+     * @inherit doc
+     */
+    public static function widget($config = [])
+    {
+        $config = self::getConfig($config);
+        return parent::widget($config);
+    }
     
     /**
      * @inheritdoc
@@ -305,7 +364,7 @@ HTML;
         $searchModel = ArrayHelper::getValue($this->itemSettings, 'searchModel', '');
         
         // Controller action in ecommerce
-        $actions = ArrayHelper::getValue($this->itemSettings, 'actions', Order::buildActions());
+        $actions = ArrayHelper::getValue($this->itemSettings, 'actions', []);
         
         // Build default columns
         $columns = ArrayHelper::getValue($this->itemSettings, 'columns', [
@@ -316,8 +375,27 @@ HTML;
                 'header'=>'',
                 'headerOptions'=>['class'=>'kartik-sheet-style']
             ],
-            '_id',
-            'creator',
+            [
+                'attribute' => '_id',
+                'hAlign'=>'center',
+                'vAlign'=>'middle',
+            ],
+            [
+                'attribute' => 'ecommerce_id',
+                'hAlign'=>'center',
+                'vAlign'=>'middle',
+                'value'=>function ($model, $key, $index, $widget) { 
+                    return Html::a($model->ecommerce_id,  
+                        Url::to(['update','id'=>$model->_id]), 
+                        ['title'=>'Xem chi tiết '.$model->ecommerce_id.'']);
+                },
+                'format'=>'raw',
+            ],
+            [
+                'attribute' => 'creator',
+                'hAlign'=>'center',
+                'vAlign'=>'middle',
+            ],
             [
                 'attribute'=>'created_at',
                 'filterType'=>$namespaceGridview::FILTER_DATE_RANGE,
@@ -340,12 +418,19 @@ HTML;
                 },
             ],
             [
-                'class'=>'kartik\grid\BooleanColumn',
                 'attribute'=>'status', 
                 'vAlign'=>'middle',
+                'width' => '150px',
+                'filterType'=>$namespaceGridview::FILTER_SELECT2,
+                'filter'=> Module::$status, 
+                'filterWidgetOptions'=>[
+                    'pluginOptions'=>['allowClear'=>true],
+                ],
+                'filterInputOptions'=>['placeholder'=>Yii::t('ecommerce', 'Status')],
                 'format'=>'raw',
-                'trueLabel' => Order::STATUS_ACTIVE,
-                'falseLabel' => Order::STATUS_INACTIVE,
+                'value'=>function ($model, $key, $index, $widget) { 
+                    return Module::$status[$model->status];
+                },
             ],
             'note',
             [
@@ -355,7 +440,7 @@ HTML;
             ]
         ]);
         
-        $button = Html::a(Yii::t('ecommerce', 'Create'). ' ' .Yii::t('ecommerce', 'Order'), $actions[Order::ACTION_CREATE] , [
+        $button = Html::a(Yii::t('ecommerce', 'Create'). ' ' .Yii::t('ecommerce', 'Order'), $actions[Module::ACTION_CREATE] , [
             'class' => 'btn btn-info',
             'style' => 'margin-bottom: 10px;',
         ]);
@@ -372,6 +457,5 @@ HTML;
     }
     
     private function registerAssets(){
-        
     }
 }
