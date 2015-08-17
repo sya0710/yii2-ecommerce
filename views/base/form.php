@@ -1,6 +1,9 @@
 <?php
 use yii\helpers\Url;
 use yii\bootstrap\ActiveForm;
+use yii\helpers\ArrayHelper;
+use yii\bootstrap\Html;
+use yii\helpers\StringHelper;
 sya\ecommerce\EcommerceAssets::register($this);
 
 $form = ActiveForm::begin([
@@ -92,7 +95,7 @@ $form = ActiveForm::begin([
 </div>
 <!-- End customer and payment -->
 
-<!-- Begin note customer and log order -->
+<!-- Begin note customer and note admin -->
 <div class="row">
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
@@ -101,14 +104,33 @@ $form = ActiveForm::begin([
             </div>
             <div class="ibox-content">
                 <?php if ($model->getIsNewRecord()): ?>
-                    <?= $form->field($model, 'note', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->textarea(['rows' => 4])->label(false); ?>
+                    <?= $form->field($model, 'note_customer', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->textarea(['rows' => 4])->label(false); ?>
                 <?php else: ?>
-                    <?= $model->note; ?>
+                    <?= $model->note_customer; ?>
                 <?php endif; ?>
             </div>
         </div>
     </div>
     <div class="col-lg-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5><?= Yii::t('ecommerce', 'Note Admin') ?></h5>
+            </div>
+            <div class="ibox-content">
+                <?= $this->render('_note_admin', [
+                    'model' => $model,
+                    'form' => $form,
+                ]); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End note customer and note admin -->
+
+<?php if (!$model->getIsNewRecord()): ?>
+<!-- Begin log order -->
+<div class="row">
+    <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5><?= Yii::t('ecommerce', 'Log order') ?></h5>
@@ -117,15 +139,15 @@ $form = ActiveForm::begin([
                 <?php if (!empty($model->log)): foreach ($model->log as $log): ?>
                     <?php 
                         // Declare infomation log
-                        $created_at = yii\helpers\ArrayHelper::getValue($log, 'created_at');
-                        $action = yii\helpers\ArrayHelper::getValue($log, 'action');
-                        $note = yii\helpers\ArrayHelper::getValue($log, 'note');
+                        $created_at = ArrayHelper::getValue($log, 'created_at');
+                        $action = ArrayHelper::getValue($log, 'action');
+                        $note = ArrayHelper::getValue($log, 'note');
                     ?>
                     <div class="timeline-item">
                         <div class="row">
                             <div class="col-xs-3 date">
-                                <i class="fa <?= yii\helpers\ArrayHelper::getValue(\sya\ecommerce\Module::$logStatus, $action) ?>"></i>
-                                    <?= date('d-m', $created_at->sec); ?>
+                                <i class="fa <?= ArrayHelper::getValue(\sya\ecommerce\Module::$logStatus, $action) ?>"></i>
+                                    <?= date('H:i a', $created_at->sec); ?>
                                 <br/>
                                 <small class="text-navy"><?= Yii::$app->formatter->asRelativeTime($created_at->sec) ?></small>
                             </div>
@@ -140,7 +162,8 @@ $form = ActiveForm::begin([
         </div>
     </div>
 </div>
-<!-- End note customer and log order -->
+<!-- End log order -->
+<?php endif; ?>
 
 <div class="row">
     <div class="col-md-6">
@@ -166,9 +189,45 @@ $this->registerJs("
         var price = $(element).parents('tr').find('.product_price').val();
         var qty = $(element).val();
         var total = Number(price) * Number(qty);
+        var id = $(element).parents('tr').find('.product_id').text();
         
-        $(element).parents('tr').find('.product_total').text(formatNumber(total));
-        $(element).parents('tr').find('.product_total').attr('data-total', total);
+        if (qty != 0) {
+            $(element).parents('tr').find('.product_total').text(formatNumber(total) + ' VNĐ');
+            $(element).parents('tr').find('.product_total').attr('data-total', total);
+            
+            // Get id and qty selected
+            var product_list = new Array();
+            if($('#product_list').val()){
+                var productSelected = $('#product_list').val().split(',');
+            }else{
+                var productSelected = null;
+            }
+            
+            // Change qty product in modal product
+            $('#product-grid-container table tbody tr').each(function(index){
+                if ($(this).attr('data-key') == id){
+                    $(this).find('.productQty input').val(qty);
+                    addProductId(productSelected, product_list, id, $(this).find('.productQty input'), this);
+                }
+            });
+        } else {
+            // Get id and qty selected
+            var product_list = new Array();
+            if($('#product_list').val()){
+                var productSelected = $('#product_list').val().split(',');
+            }else{
+                var productSelected = null;
+            }
+            
+            // Remove qty product in modal product
+            $('#product-grid-container table tbody tr').each(function(index){
+                if ($(this).attr('data-key') == id){
+                    removeProductId(productSelected, product_list, id, $(this).find('.productQty input'), this);
+                }
+            });
+
+            $(element).parents('tr').remove();
+        }
         
         totalProduct();
     }
@@ -190,6 +249,5 @@ $this->registerJs("
 ", yii\web\View::POS_END);
 
 $this->registerJs("
-    totalProduct();
 ", yii\web\View::POS_READY);
 ?>

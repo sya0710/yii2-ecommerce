@@ -37,7 +37,7 @@ class BaseController extends \yii\web\Controller{
         $model->scenario = 'create';
         
         if ($model->load(Yii::$app->request->post()) AND $model->save()){
-            $this->redirect(['index', 'id' => $model->_id]);
+            $this->redirect(['update', 'id' => $model->_id]);
         }
         
         Yii::$app->view->title = Yii::t($this->module->id, 'Create') . ' ' . Yii::t($this->module->id, 'Order');
@@ -71,7 +71,7 @@ class BaseController extends \yii\web\Controller{
         $model->scenario = 'create';
         
         if ($model->load(Yii::$app->request->post()) AND $model->save()){
-            $this->redirect(['index', 'id' => $model->_id]);
+            $this->redirect(['update', 'id' => $model->_id]);
         }
         
         Yii::$app->view->title = Yii::t($this->module->id, 'Update') . ' ' . Yii::t($this->module->id, 'Order') . ': ' . $model->ecommerce_id;

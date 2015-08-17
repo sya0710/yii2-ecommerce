@@ -13,6 +13,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
      * @inheritdoc
      */
     public function beforeSave($insert) {
+        var_dump($this);die;
         $attributes = array_keys($this->getAttributes());
 
         // ID
@@ -48,32 +49,59 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                         'creator' => Yii::$app->user->id,
                         'created_at' => $now,
                         'action' => 'add',
-                        'note' => Yii::$app->user->id . ' add new order: ' . $this->ecommerce_id
+                        'note' => 'Add new order: ' . $this->ecommerce_id
                     ]
                 ];
             }
         } else {
-            if ($this->status === ''){
-                $this->log = ArrayHelper::merge([
-                    [
-                        'creator' => Yii::$app->user->id,
-                        'created_at' => $now,
-                        'action' => 'delete',
-                        'note' => Yii::$app->user->id . ' delete order: ' . $this->ecommerce_id
-                    ]
-                ], $this->log);
-            } else {
-                $this->log = ArrayHelper::merge([
-                    [
-                        'creator' => Yii::$app->user->id,
-                        'created_at' => $now,
-                        'action' => 'update',
-                        'note' => Yii::$app->user->id . ' update order: ' . $this->ecommerce_id
-                    ]
-                ], $this->log);
+            if (in_array('log', $attributes) AND in_array('note_admin_content', $attributes) AND empty($this->note_admin_content)){
+                if ($this->status === ''){
+                    $this->log = ArrayHelper::merge([
+                        [
+                            'creator' => Yii::$app->user->id,
+                            'created_at' => $now,
+                            'action' => 'delete',
+                            'note' => 'Delete order: ' . $this->ecommerce_id
+                        ]
+                    ], $this->log);
+                } else {
+                    $this->log = ArrayHelper::merge([
+                        [
+                            'creator' => Yii::$app->user->id,
+                            'created_at' => $now,
+                            'action' => 'update',
+                            'note' => 'Update order: ' . $this->ecommerce_id
+                        ]
+                    ], $this->log);
+                }
             }
         }
-
+        
+        // Note admin
+        if ($this->isNewRecord) {
+            if (in_array('note_admin', $attributes) AND in_array('note_admin_content', $attributes) AND !empty($this->note_admin_content)){
+                $this->note_admin = [
+                    [
+                        'content' => $this->note_admin_content,
+                        'creator' => Yii::$app->user->id,
+                        'created_at' => $now,
+                    ]
+                ];
+                $this->note_admin_content = '';
+            }
+        } else {
+            if (in_array('note_admin', $attributes) AND in_array('note_admin_content', $attributes) AND !empty($this->note_admin_content)){
+                $this->note_admin = ArrayHelper::merge($this->note_admin, [
+                    [
+                        'content' => $this->note_admin_content,
+                        'creator' => Yii::$app->user->id,
+                        'created_at' => $now,
+                    ]
+                ]);
+                $this->note_admin_content = '';
+            }
+        }
+        
         return parent::beforeSave($insert);
     }
 

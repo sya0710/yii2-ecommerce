@@ -432,7 +432,7 @@ HTML;
                     return Module::$status[$model->status];
                 },
             ],
-            'note',
+            'note_customer',
             [
                 'class'=>'kartik\grid\ActionColumn',
                 'urlCreator'=>function($action, $model, $key, $index) { return Url::to(['delete','id'=>$model->_id]); },

@@ -17,7 +17,9 @@ use Yii;
  * @property mixed $product
  * @property mixed $customer
  * @property mixed $payment
- * @property mixed $note
+ * @property mixed $note_customer
+ * @property mixed $note_admin
+ * @property mixed $note_admin_content
  * @property mixed $log
  */
 class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
@@ -46,7 +48,9 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'product',
             'customer',
             'payment',
-            'note',
+            'note_customer',
+            'note_admin',
+            'note_admin_content',
             'log',
         ];
     }
@@ -57,7 +61,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
     public function rules()
     {
         return [
-            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note', 'log'], 'safe']
+            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'], 'safe']
         ];
     }
 
@@ -77,7 +81,9 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'product' => Yii::t('ecommerce', 'Product'),
             'customer' => Yii::t('ecommerce', 'Customer'),
             'payment' => Yii::t('ecommerce', 'Payment'),
-            'note' => Yii::t('ecommerce', 'Note'),
+            'note_customer' => Yii::t('ecommerce', 'Note Customer'),
+            'note_admin' => Yii::t('ecommerce', 'Note Admin'),
+            'note_admin_content' => Yii::t('ecommerce', 'Note Admin Content'),
             'log' => Yii::t('ecommerce', 'Log'),
         ];
     }

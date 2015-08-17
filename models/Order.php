@@ -6,7 +6,6 @@ use Yii;
 use yii\base\Model;
 use yii\bootstrap\Html;
 use sya\ecommerce\Ecommerce;
-use yii\i18n\Formatter;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -32,7 +31,9 @@ use yii\helpers\ArrayHelper;
  * - phone: phone of customer.
  * - email: email of customer.
  * @property mixed $payment
- * @property mixed $note
+ * @property mixed $note_customer
+ * @property mixed $note_admin
+ * @property mixed $note_admin_content
  * @property mixed $log
  */
 class Order extends BaseOrder
@@ -54,9 +55,9 @@ class Order extends BaseOrder
     public function scenarios()
     {
         return array_merge(Model::scenarios(), [
-            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note', 'log'],
-            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note', 'log'],
-            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note', 'log'],
+            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
         ]);
     }
     
@@ -139,6 +140,7 @@ class Order extends BaseOrder
 
             // Begin list product
                 $template .= Html::beginTag('tbody');
+                    $sumTotal = 0;
                     foreach ($products as $product) {
                         // Get value in product
                         $id = ArrayHelper::getValue($product, 'id', '');
@@ -148,10 +150,11 @@ class Order extends BaseOrder
                         $quantity = ArrayHelper::getValue($product, 'quantity', 0);
                         $is_marketing = ArrayHelper::getValue($product, 'is_marketing', '1');
                         $total = $price * $quantity;
+                        $sumTotal += $total; 
 
                         $template .= Html::beginTag('tr');
                             $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= $id;
+                                $template .= Html::tag('span', $id, ['class' => 'product_id']);
                                 $template .= Html::hiddenInput($modelName . '[product][' . $id . '][id]', $id, ['class' => 'form-control', 'readonly' => true]);
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['class' => 'text-vertical']);
@@ -160,16 +163,17 @@ class Order extends BaseOrder
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['class' => 'text-vertical']);
                                 $template .= $title;
+                                $template .= Html::hiddenInput($modelName . '[product][' . $id . '][title]', $title, ['class' => 'form-control', 'readonly' => true]);
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= (new Formatter)->asDecimal($price, 0) . ' VNĐ';
+                                $template .= Yii::$app->formatter->asDecimal($price, 0) . ' VNĐ';
                                 $template .= Html::hiddenInput($modelName . '[product][' . $id . '][price]', $price, ['class' => 'form-control product_price', 'readonly' => true]);
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td');
                                 $template .= Html::textInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty', 'onkeyup' => 'return totalPriceProduct(this);']);
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= Html::tag('span', (new Formatter)->asDecimal($total, 0) . ' VNĐ', ['class' => 'product_total', 'data-total' => $total]);
+                                $template .= Html::tag('span', Yii::$app->formatter->asDecimal($total, 0) . ' VNĐ', ['class' => 'product_total', 'data-total' => $total]);
                             $template .= Html::endTag('td');
                         $template .= Html::endTag('tr');
                     }
@@ -182,7 +186,7 @@ class Order extends BaseOrder
             // Begin total product
             $template .= Html::beginTag('div', ['class' => 'row']);
                 $template .= Html::beginTag('div', ['class' => 'col-sm-12 m-b-xs text-right']);
-                    $template .= 'Tổng tiền: ' . Html::tag('span', 0, ['id' => 'product_total']) . ' VNĐ';
+                    $template .= 'Tổng tiền: ' . Html::tag('span', Yii::$app->formatter->asDecimal($sumTotal, 0), ['id' => 'product_total']) . ' VNĐ';
                 $template .= Html::endTag('div');
             $template .= Html::endTag('div');
             // End total product
@@ -191,5 +195,33 @@ class Order extends BaseOrder
         }
         
         return null;
+    }
+    
+    /**
+     * Function generate note admin
+     * @return string
+     */
+    public function generateNoteAdmin(){
+        $template = Html::beginTag('div', ['class' => 'feed-activity-list']);
+        
+        if (is_array($this->note_admin) AND ! empty($this->note_admin)): 
+            foreach ($this->note_admin as $note_admin):
+                $admin = ArrayHelper::getValue($note_admin, 'creator');
+                $content = ArrayHelper::getValue($note_admin, 'content');
+                $created_at = ArrayHelper::getValue($note_admin, 'created_at');
+                $template .= Html::beginTag('div', ['class' => 'feed-element']);
+                    $template .= Html::beginTag('div');
+                        $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at->sec), ['class' => 'pull-right text-navy']);
+                        $template .= Html::tag('strong', $admin);
+                        $template .= Html::tag('div', $content);
+                        $template .= Html::tag('small', date('l h:i a \- d.m.Y', $created_at->sec));
+                    $template .= Html::endTag('div');
+                $template .= Html::endTag('div');
+            endforeach;
+        endif;
+        
+        $template .= Html::endTag('div');
+        
+        return $template;
     }
 }

@@ -63,4 +63,26 @@ class AjaxController extends \yii\web\Controller{
         }
     }
     
+    /**
+     * Action add note admin in order
+     */
+    public function actionAddnoteadmin(){
+        $id  = Yii::$app->request->post('id');
+        $note_admin_content  = Yii::$app->request->post('note_admin_content');
+        
+        // Get namespace of model
+        $ecommerce = Ecommerce::module();
+
+        // Namespace of product model
+        $modelOrder = $ecommerce->itemModule;
+        
+        $model = $modelOrder::findOne($id);
+        $model->note_admin_content = $note_admin_content;
+        if ($model->save()){
+            echo $model->generateNoteAdmin();
+        }
+        
+        echo null;
+    }
+    
 }
