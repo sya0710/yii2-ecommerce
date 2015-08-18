@@ -7,6 +7,7 @@ use yii\base\Model;
 use yii\bootstrap\Html;
 use sya\ecommerce\Ecommerce;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * This is the model class for collection "order".
@@ -72,7 +73,7 @@ class Order extends BaseOrder
         $query->orderBy('created_at DESC');
         $query->where([
             'status' => [
-                '$ne' => \sya\ecommerce\Module::$status['']
+                '$ne' => ''
             ]
         ]);
 
@@ -207,12 +208,21 @@ class Order extends BaseOrder
         if (is_array($this->note_admin) AND ! empty($this->note_admin)): 
             foreach ($this->note_admin as $note_admin):
                 $admin = ArrayHelper::getValue($note_admin, 'creator');
+                $adminName = ArrayHelper::getValue($note_admin, 'creator_name');
                 $content = ArrayHelper::getValue($note_admin, 'content');
                 $created_at = ArrayHelper::getValue($note_admin, 'created_at');
+                
+                // Get namespace of model
+                $ecommerce = Ecommerce::module();
+
+                // User field
+                $linkUser = ArrayHelper::getValue($ecommerce->userTable, 'linkInfo');
+                $idUser = ArrayHelper::getValue($ecommerce->userTable, 'idField');
+                
                 $template .= Html::beginTag('div', ['class' => 'feed-element']);
                     $template .= Html::beginTag('div');
                         $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at->sec), ['class' => 'pull-right text-navy']);
-                        $template .= Html::tag('strong', $admin);
+                        $template .= Html::a(Html::tag('strong', $adminName), Url::to([$linkUser, $idUser => $admin]));
                         $template .= Html::tag('div', $content);
                         $template .= Html::tag('small', date('l h:i a \- d.m.Y', $created_at->sec));
                     $template .= Html::endTag('div');

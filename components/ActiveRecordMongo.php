@@ -3,9 +3,9 @@
 namespace sya\ecommerce\components;
 
 use Yii;
-use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use MongoDate;
+use sya\ecommerce\Ecommerce;
 
 class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
 
@@ -13,8 +13,13 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
      * @inheritdoc
      */
     public function beforeSave($insert) {
-        var_dump($this);die;
         $attributes = array_keys($this->getAttributes());
+        
+        // Get namespace of model
+        $ecommerce = Ecommerce::module();
+        
+        // User name field
+        $username = ArrayHelper::getValue($ecommerce->userTable, 'nameField');
 
         // ID
         if ($this->isNewRecord AND empty($this->_id))
@@ -26,7 +31,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         
         // status
         if ($this->isNewRecord AND empty($this->status))
-            $this->status = 'new';
+            $this->status = $ecommerce::STATUS_NEW;
         
         // date time
         $now = new MongoDate();
@@ -47,6 +52,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 $this->log = [
                     [
                         'creator' => Yii::$app->user->id,
+                        'creator_name' => Yii::$app->user->identity->$username,
                         'created_at' => $now,
                         'action' => 'add',
                         'note' => 'Add new order: ' . $this->ecommerce_id
@@ -59,6 +65,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     $this->log = ArrayHelper::merge([
                         [
                             'creator' => Yii::$app->user->id,
+                            'creator_name' => Yii::$app->user->identity->$username,
                             'created_at' => $now,
                             'action' => 'delete',
                             'note' => 'Delete order: ' . $this->ecommerce_id
@@ -68,6 +75,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     $this->log = ArrayHelper::merge([
                         [
                             'creator' => Yii::$app->user->id,
+                            'creator_name' => Yii::$app->user->identity->$username,
                             'created_at' => $now,
                             'action' => 'update',
                             'note' => 'Update order: ' . $this->ecommerce_id
@@ -84,6 +92,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     [
                         'content' => $this->note_admin_content,
                         'creator' => Yii::$app->user->id,
+                        'creator_name' => Yii::$app->user->identity->$username,
                         'created_at' => $now,
                     ]
                 ];
@@ -95,6 +104,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     [
                         'content' => $this->note_admin_content,
                         'creator' => Yii::$app->user->id,
+                        'creator_name' => Yii::$app->user->identity->$username,
                         'created_at' => $now,
                     ]
                 ]);

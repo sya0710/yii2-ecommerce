@@ -3,7 +3,7 @@ use yii\helpers\Url;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\Html;
-use yii\helpers\StringHelper;
+use sya\ecommerce\Module;
 sya\ecommerce\EcommerceAssets::register($this);
 
 $form = ActiveForm::begin([
@@ -95,7 +95,7 @@ $form = ActiveForm::begin([
 </div>
 <!-- End customer and payment -->
 
-<!-- Begin note customer and note admin -->
+<!-- Begin note customer and Payment -->
 <div class="row">
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
@@ -114,6 +114,32 @@ $form = ActiveForm::begin([
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
+                <h5><?= Yii::t('ecommerce', 'Status') ?></h5>
+            </div>
+            <div class="ibox-content">
+                <?php if (!$model->getIsNewRecord()): ?>
+                    <?php
+                        // Remove element key Module::STATUS_NEW in status when action is update
+                        if (ArrayHelper::getValue(Module::$status, Module::STATUS_NEW)){
+                            ArrayHelper::remove(Module::$status, Module::STATUS_NEW);
+                        }
+                        
+                        echo $form->field($model, 'status', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->dropDownList(Module::$status)->label(false);
+                    ?>
+                <?php else: ?>
+                    <?= ArrayHelper::getValue(Module::$status, Module::STATUS_NEW); ?>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End note customer and Payment -->
+
+<!-- Begin note admin -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
                 <h5><?= Yii::t('ecommerce', 'Note Admin') ?></h5>
             </div>
             <div class="ibox-content">
@@ -125,7 +151,7 @@ $form = ActiveForm::begin([
         </div>
     </div>
 </div>
-<!-- End note customer and note admin -->
+<!-- End note admin -->
 
 <?php if (!$model->getIsNewRecord()): ?>
 <!-- Begin log order -->
@@ -142,6 +168,7 @@ $form = ActiveForm::begin([
                         $created_at = ArrayHelper::getValue($log, 'created_at');
                         $action = ArrayHelper::getValue($log, 'action');
                         $note = ArrayHelper::getValue($log, 'note');
+                        $logCreator = ArrayHelper::getValue($log, 'creator_name');
                     ?>
                     <div class="timeline-item">
                         <div class="row">
@@ -153,7 +180,7 @@ $form = ActiveForm::begin([
                             </div>
                             <div class="col-xs-9 content no-top-border">
                                 <p class="m-b-xs"><strong><?= ucfirst($action); ?></strong></p>
-                                <p><?= $note; ?></p>
+                                <p><?= $logCreator . ' ' . $note; ?></p>
                             </div>
                         </div>
                     </div>
@@ -247,7 +274,4 @@ $this->registerJs("
         $('#product_total').text(formatNumber(product_total));
     }
 ", yii\web\View::POS_END);
-
-$this->registerJs("
-", yii\web\View::POS_READY);
 ?>

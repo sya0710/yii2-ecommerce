@@ -9,7 +9,6 @@ Modal::begin([
     'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Save changes</button>'
 ]);
 ?>
-sdád123213
 <?php
 Modal::end();
 ?>

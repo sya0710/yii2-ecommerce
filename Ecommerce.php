@@ -429,7 +429,7 @@ HTML;
                 'filterInputOptions'=>['placeholder'=>Yii::t('ecommerce', 'Status')],
                 'format'=>'raw',
                 'value'=>function ($model, $key, $index, $widget) { 
-                    return Module::$status[$model->status];
+                    return ArrayHelper::getValue(Module::$status, $model->status);
                 },
             ],
             'note_customer',

@@ -6,11 +6,12 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 class Module extends \yii\base\Module{
+    // Module name
     CONST MODULE = 'ecommerce';
     
     // Status
-    CONST STATUS_ACTIVE = 'Hiện';
-    CONST STATUS_INACTIVE = 'Ẩn';
+    CONST STATUS_ACTIVE = 'Active';
+    CONST STATUS_INACTIVE = 'In Active';
     
     // Action in ecommerce
     CONST ACTION_INDEX = 'index';
@@ -18,21 +19,21 @@ class Module extends \yii\base\Module{
     CONST ACTION_UPDATE = 'update';
     CONST ACTION_CREATE = 'create';
     
+    // List Status Order
+    CONST STATUS_NEW = 'new';
+    CONST STATUS_PROCESS = 'processing';
+    CONST STATUS_PEDING = 'pending';
+    CONST STATUS_GOOSHAD = 'goodshad';
+    CONST STATUS_MOVE = 'movedtoshop';
+    CONST STATUS_DELIVERY = 'delivery';
+    CONST STATUS_COMPLETE = 'complete';
+    CONST STATUS_CANCEL = 'cancel';
+    CONST STATUS_CLOSE = 'close';
+    
     /**
      * Status of order
      */
-    public static $status = [
-        '' => '',
-        'new' => 'Đơn hàng mới',
-        'processing' => 'Đang xử lý',
-        'pending' => 'Chờ đặt hàng',
-        'goodshad' => 'Hàng đã về',
-        'movedtoshop' => 'Đã chuyển xuống cửa hàng',
-        'delivery' => 'Đang giao hàng',
-        'complete' => 'Hoàn thành',
-        'cancel' => 'Hủy bỏ',
-        'close' => 'Đóng',
-    ];
+    public static $status;
     
     /**
      * Log status action order
@@ -66,11 +67,21 @@ class Module extends \yii\base\Module{
     public $productColumns = [];
     
     /**
+     * @var array User infomation in your table user
+     */
+    public $userTable = [
+        'nameField' => 'p_username',
+        'idField' => 'id',
+        'linkInfo' => '/account/backend/default/update',
+    ];
+    
+    /**
      * @inherit doc
      */
     public function init()
     {
         parent::init();
+        // Setup params itemSettings
         $item = ArrayHelper::getValue($this->itemSettings, 'itemSettings', []);
         $actions = ArrayHelper::getValue($item, 'actions', []);
         $actions += [
@@ -81,10 +92,23 @@ class Module extends \yii\base\Module{
         ];
         
         $this->itemSettings['itemSettings']['actions'] = $actions;
+        
+        // Setup params status
+        self::$status = [
+            self::STATUS_NEW => Yii::t('ecommerce', 'New'),
+            self::STATUS_PROCESS => Yii::t('ecommerce', 'Processing'),
+            self::STATUS_PEDING => Yii::t('ecommerce', 'Pending'),
+            self::STATUS_GOOSHAD => Yii::t('ecommerce', 'Goods Had'),
+            self::STATUS_MOVE => Yii::t('ecommerce', 'Moved to shop'),
+            self::STATUS_DELIVERY => Yii::t('ecommerce', 'Delivery'),
+            self::STATUS_COMPLETE => Yii::t('ecommerce', 'Complete'),
+            self::STATUS_CANCEL => Yii::t('ecommerce', 'Cancel'),
+            self::STATUS_CLOSE => Yii::t('ecommerce', 'Close'),
+        ];
     }
     
     /**
-     * 
+     * Function get product list active when chose modal product
      * @param array $product_list List id, quantity of product
      * [
      *      1 => [
