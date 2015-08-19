@@ -8,6 +8,7 @@ use yii\bootstrap\Html;
 use sya\ecommerce\Ecommerce;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use sya\ecommerce\helpers\SyaHelper;
 
 /**
  * This is the model class for collection "order".
@@ -86,6 +87,16 @@ class Order extends BaseOrder
 
         if (!($this->load($params) AND $this->validate())) {
             return $dataProvider;
+        }
+        
+        $query = SyaHelper::addMongoFilter($query, 'ecommerce_id', $this->ecommerce_id);
+        $query = SyaHelper::addMongoFilter($query, 'status', $this->status);
+        
+        if (!empty($this->created_at)){
+            list($minDate, $maxDate) = explode(' to ', $this->created_at);
+            $min_date = new \MongoDate(strtotime($minDate . ' 00:00:00'));
+            $max_date = new \MongoDate(strtotime($maxDate . ' 23:59:59'));
+            $query = SyaHelper::addMongoFilter($query, 'created_at', [$min_date, $max_date], 'between');
         }
 
         return $dataProvider;
