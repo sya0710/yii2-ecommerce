@@ -117,18 +117,9 @@ $form = ActiveForm::begin([
                 <h5><?= Yii::t('ecommerce', 'Status') ?></h5>
             </div>
             <div class="ibox-content">
-                <?php if (!$model->getIsNewRecord()): ?>
-                    <?php
-                        // Remove element key Module::STATUS_NEW in status when action is update
-                        if (ArrayHelper::getValue(Module::$status, Module::STATUS_NEW)){
-                            ArrayHelper::remove(Module::$status, Module::STATUS_NEW);
-                        }
-                        
-                        echo $form->field($model, 'status', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->dropDownList(Module::$status)->label(false);
-                    ?>
-                <?php else: ?>
-                    <?= ArrayHelper::getValue(Module::$status, Module::STATUS_NEW); ?>
-                <?php endif; ?>
+                <?= $this->render('_status', [
+                    'model' => $model,
+                ]); ?>
             </div>
         </div>
     </div>

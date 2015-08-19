@@ -9,6 +9,7 @@ return [
     'Goods Had' => 'Hàng đã về',
     'Moved to shop' => 'Đã chuyển xuống cửa hàng',
     'Delivery' => 'Đang giao hàng',
+    'Paid' => 'Đã thanh toán',
     'Complete' => 'Hoàn thành',
     'Cancel' => 'Hủy bỏ',
     'Close' => 'Đóng',

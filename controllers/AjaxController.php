@@ -5,6 +5,8 @@ namespace sya\ecommerce\controllers;
 use Yii;
 use yii\helpers\ArrayHelper;
 use sya\ecommerce\Ecommerce;
+use yii\web\NotFoundHttpException;
+use sya\ecommerce\Module;
 
 class AjaxController extends \yii\web\Controller{
     
@@ -67,22 +69,51 @@ class AjaxController extends \yii\web\Controller{
      * Action add note admin in order
      */
     public function actionAddnoteadmin(){
-        $id  = Yii::$app->request->post('id');
+        $id = Yii::$app->request->post('id');
         $note_admin_content  = Yii::$app->request->post('note_admin_content');
         
-        // Get namespace of model
-        $ecommerce = Ecommerce::module();
-
-        // Namespace of product model
-        $modelOrder = $ecommerce->itemModule;
+        $model = $this->findModel($id);
         
-        $model = $modelOrder::findOne($id);
-        $model->note_admin_content = $note_admin_content;
-        if ($model->save()){
-            echo $model->generateNoteAdmin();
+        if (!empty($note_admin_content)){
+            $model->note_admin_content = $note_admin_content;
+            $model->save();
         }
         
-        echo null;
+        echo $model->generateNoteAdmin();
+    }
+    
+    /**
+     * Action change status order
+     */
+    public function actionChangestatus(){
+        $id = Yii::$app->request->post('id');
+        $status = Yii::$app->request->post('status');
+        
+        $model = $this->findModel($id);
+        
+        $model->status = $status;
+        $model->save();
+        
+        echo json_encode(Module::getListStatus($model->status));
+    }
+    
+    /**
+     * Finds the model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id){
+        // Get namespace of model
+        $ecommerce = Ecommerce::module();
+        $namespaceModel = $ecommerce->itemModule;
+        
+        if (($model = $namespaceModel::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
     
 }

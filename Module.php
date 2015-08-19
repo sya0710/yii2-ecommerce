@@ -20,12 +20,14 @@ class Module extends \yii\base\Module{
     CONST ACTION_CREATE = 'create';
     
     // List Status Order
+    CONST STATUS_EMPTY = '';
     CONST STATUS_NEW = 'new';
     CONST STATUS_PROCESS = 'processing';
-    CONST STATUS_PEDING = 'pending';
+    CONST STATUS_PENDING = 'pending';
     CONST STATUS_GOOSHAD = 'goodshad';
     CONST STATUS_MOVE = 'movedtoshop';
     CONST STATUS_DELIVERY = 'delivery';
+    CONST STATUS_PAID = 'paid';
     CONST STATUS_COMPLETE = 'complete';
     CONST STATUS_CANCEL = 'cancel';
     CONST STATUS_CLOSE = 'close';
@@ -95,16 +97,120 @@ class Module extends \yii\base\Module{
         
         // Setup params status
         self::$status = [
+            self::STATUS_EMPTY => Yii::t('ecommerce', '-- Chose Status --'),
             self::STATUS_NEW => Yii::t('ecommerce', 'New'),
             self::STATUS_PROCESS => Yii::t('ecommerce', 'Processing'),
-            self::STATUS_PEDING => Yii::t('ecommerce', 'Pending'),
+            self::STATUS_PENDING => Yii::t('ecommerce', 'Pending'),
             self::STATUS_GOOSHAD => Yii::t('ecommerce', 'Goods Had'),
             self::STATUS_MOVE => Yii::t('ecommerce', 'Moved to shop'),
             self::STATUS_DELIVERY => Yii::t('ecommerce', 'Delivery'),
+            self::STATUS_PAID => Yii::t('ecommerce', 'Paid'),
             self::STATUS_COMPLETE => Yii::t('ecommerce', 'Complete'),
             self::STATUS_CANCEL => Yii::t('ecommerce', 'Cancel'),
             self::STATUS_CLOSE => Yii::t('ecommerce', 'Close'),
         ];
+    }
+    
+    /**
+     * Function get list status by status
+     * @param string $status status
+     * @return array
+     */
+    public static function getListStatus($status){
+        // Deleted array elements for key
+        $allStatus = [
+            self::STATUS_NEW => [
+                self::STATUS_NEW,
+                self::STATUS_GOOSHAD,
+                self::STATUS_MOVE,
+                self::STATUS_DELIVERY,
+                self::STATUS_PAID,
+                self::STATUS_COMPLETE,
+                self::STATUS_CLOSE,
+            ],
+            self::STATUS_PROCESS => [
+                self::STATUS_PROCESS,
+                self::STATUS_NEW,
+                self::STATUS_GOOSHAD,
+                self::STATUS_CLOSE,
+            ],
+            self::STATUS_PENDING => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_MOVE,
+                self::STATUS_DELIVERY,
+                self::STATUS_PAID,
+                self::STATUS_COMPLETE,
+                self::STATUS_CLOSE,
+            ],
+            self::STATUS_GOOSHAD => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_CLOSE,
+            ],
+            self::STATUS_MOVE => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_MOVE,
+            ],
+            self::STATUS_DELIVERY => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_MOVE,
+                self::STATUS_DELIVERY,
+            ],
+            self::STATUS_PAID => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_PAID,
+            ],
+            self::STATUS_CANCEL => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_MOVE,
+                self::STATUS_DELIVERY,
+                self::STATUS_PAID,
+                self::STATUS_COMPLETE,
+                self::STATUS_CANCEL,
+                self::STATUS_CLOSE,
+            ],
+            self::STATUS_CLOSE => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_MOVE,
+                self::STATUS_DELIVERY,
+                self::STATUS_PAID,
+                self::STATUS_COMPLETE,
+                self::STATUS_CANCEL,
+                self::STATUS_CLOSE,
+            ],
+            self::STATUS_COMPLETE => [
+                self::STATUS_NEW,
+                self::STATUS_PROCESS,
+                self::STATUS_PENDING,
+                self::STATUS_GOOSHAD,
+                self::STATUS_MOVE,
+                self::STATUS_DELIVERY,
+                self::STATUS_PAID,
+                self::STATUS_COMPLETE,
+                self::STATUS_CANCEL,
+            ],
+        ];
+
+        return array_diff_key(self::$status, array_flip($allStatus[$status]));
     }
     
     /**
