@@ -418,18 +418,56 @@ HTML;
                 },
             ],
             [
-                'attribute'=>'status', 
+                'class'=>'kartik\grid\EditableColumn',
+                'attribute'=>'status',
                 'vAlign'=>'middle',
-                'width' => '150px',
+                'width'=>'150px',
                 'filterType'=>$namespaceGridview::FILTER_SELECT2,
                 'filter'=> Module::$status, 
                 'filterWidgetOptions'=>[
                     'pluginOptions'=>['allowClear'=>true],
                 ],
                 'filterInputOptions'=>['placeholder'=>Yii::t('ecommerce', 'Status')],
+                'editableOptions'=> function ($model, $key, $index){
+                    return [
+                        'header' => Yii::t('ecommerce', 'Status'),
+                        'size'=>'md',
+                        'inputType'=>\kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                        'buttonsTemplate' => '',
+                        'data' => Module::getListStatus($model->status),
+                        'options'=>[
+                            'class' => 'syaSelectStatus form-control',
+                            'options'=>[
+                                'pluginOptions'=>['allowClear'=>true],
+                            ],
+                        ],
+                        'pluginEvents' => [
+                            "editableChange"=>"function(event, val) {
+                                var element = $(this);
+                                var id = element.parents('tr').attr('data-key');
+                                var status = jQuery.parseJSON('" . json_encode(Module::$status) . "');
+                                var check = confirm('Are you sure?');
+                                if (check == true){
+                                    $.ajax({
+                                        url: '" . \yii\helpers\Url::to(['/ecommerce/ajax/changestatus']) . "',
+                                        type: 'post',
+                                        dataType: 'json',
+                                        data: {status: val, id: id},
+                                    }).done(function (data) {
+                                        element.find('.syaStatus').text(status[val]);
+                                        element.find('.syaSelectStatus').empty();
+                                        $.each(data, function(key, value) { 
+                                            element.find('.syaSelectStatus').append( new Option(value, key) );
+                                        });
+                                    });
+                                }
+                            }",
+                        ]
+                    ];
+                },
                 'format'=>'raw',
                 'value'=>function ($model, $key, $index, $widget) { 
-                    return ArrayHelper::getValue(Module::$status, $model->status);
+                    return Html::tag('span', ArrayHelper::getValue(Module::$status, $model->status), ['class' => 'syaStatus']);
                 },
             ],
             'note_customer',

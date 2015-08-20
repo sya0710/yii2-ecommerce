@@ -152,7 +152,7 @@ $form = ActiveForm::begin([
             <div class="ibox-title">
                 <h5><?= Yii::t('ecommerce', 'Log order') ?></h5>
             </div>
-            <div class="ibox-content inspinia-timeline">
+            <div class="ibox-content inspinia-timeline" id='syaTimeline'>
                 <?php if (!empty($model->log)): foreach ($model->log as $log): ?>
                     <?php 
                         // Declare infomation log
