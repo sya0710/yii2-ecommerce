@@ -15,6 +15,7 @@ use Yii;
  * @property mixed $updated_at
  * @property mixed $status
  * @property mixed $product
+ * @property mixed $shipping
  * @property mixed $customer
  * @property mixed $payment
  * @property mixed $note_customer
@@ -46,6 +47,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'updated_at',
             'status',
             'product',
+            'shipping',
             'customer',
             'payment',
             'note_customer',
@@ -61,7 +63,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
     public function rules()
     {
         return [
-            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'], 'safe']
+            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'], 'safe']
         ];
     }
 
@@ -85,6 +87,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'note_admin' => Yii::t('ecommerce', 'Note Admin'),
             'note_admin_content' => Yii::t('ecommerce', 'Note Admin Content'),
             'log' => Yii::t('ecommerce', 'Log'),
+            'shipping' => Yii::t('ecommerce', 'Shipping'),
         ];
     }
 }

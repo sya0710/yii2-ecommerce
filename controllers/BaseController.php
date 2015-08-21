@@ -83,7 +83,7 @@ class BaseController extends \yii\web\Controller{
             'productSearchModel' => $productSearchModel,
             'productDataProvider' => $productDataProvider,
             'productColumns' => $ecommerce->productColumns,
-            'template' => $model->generateProductOrder($model->product)
+            'template' => $model->generateProductOrder($model->product, $model->shipping)
         ]);
     }
     

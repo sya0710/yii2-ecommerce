@@ -432,6 +432,7 @@ HTML;
                     return [
                         'header' => Yii::t('ecommerce', 'Status'),
                         'size'=>'md',
+                        'placement' => 'top',
                         'inputType'=>\kartik\editable\Editable::INPUT_DROPDOWN_LIST,
                         'buttonsTemplate' => '',
                         'data' => Module::getListStatus($model->status),

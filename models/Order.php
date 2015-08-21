@@ -26,6 +26,7 @@ use sya\ecommerce\helpers\SyaHelper;
  * - price: price of product when ordering at that time. (No change when price of product change).
  * - quantity: quantity order of product.
  * - is_marketing: promotional products or not at the time. (No change)
+ * @property mixed $shipping
  * @property mixed $customer: infomation of customer when shopping
  * - id: id of customer.
  * - buyer: people buy products.
@@ -57,9 +58,9 @@ class Order extends BaseOrder
     public function scenarios()
     {
         return array_merge(Model::scenarios(), [
-            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
-            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
-            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
         ]);
     }
     
@@ -116,92 +117,118 @@ class Order extends BaseOrder
      * ]
      * @return string
      */
-    public function generateProductOrder($products = []){
+    public function generateProductOrder($products = [], $shipping = 0){
         if (!empty($products)) {
+            // IF shipping is not number then assign value shipping = 0
+            if (!is_integer(intval($shipping)))
+                $shipping = 0;
+                
             // Get model name of product
             $ecommerce = Ecommerce::module();
             $modelName = end(explode('\\', $ecommerce->itemModule));
 
             // Begin list product order
-            $template = Html::beginTag('table', ['class' => 'table table-striped']);
+            $template = Html::beginTag('div', ['class' => 'table-responsive']);
+                $template .= Html::beginTag('table', ['class' => 'table table-striped']);
 
-            // Begin header table
-                $template .= Html::beginTag('thead');
-                    $template .= Html::beginTag('tr');
-                        $template .= Html::beginTag('th');
-                            $template .= Yii::t('ecommerce', 'ID');
-                        $template .= Html::endTag('th');
-                        $template .= Html::beginTag('th');
-                            $template .= Yii::t('ecommerce', 'Sku');
-                        $template .= Html::endTag('th');
-                        $template .= Html::beginTag('th');
-                            $template .= Yii::t('ecommerce', 'Title');
-                        $template .= Html::endTag('th');
-                        $template .= Html::beginTag('th');
-                            $template .= Yii::t('ecommerce', 'Price');
-                        $template .= Html::endTag('th');
-                        $template .= Html::beginTag('th');
-                            $template .= Yii::t('ecommerce', 'Quantity');
-                        $template .= Html::endTag('th');
-                        $template .= Html::beginTag('th');
-                            $template .= Yii::t('ecommerce', 'Total Price');
-                        $template .= Html::endTag('th');
-                    $template .= Html::endTag('tr');
-                $template .= Html::endTag('thead');
-            // End header table
-
-            // Begin list product
-                $template .= Html::beginTag('tbody');
-                    $sumTotal = 0;
-                    foreach ($products as $product) {
-                        // Get value in product
-                        $id = ArrayHelper::getValue($product, 'id', '');
-                        $sku = ArrayHelper::getValue($product, 'sku', '');
-                        $title = ArrayHelper::getValue($product, 'title', '');
-                        $price = ArrayHelper::getValue($product, 'price', 0);
-                        $quantity = ArrayHelper::getValue($product, 'quantity', 0);
-                        $is_marketing = ArrayHelper::getValue($product, 'is_marketing', '1');
-                        $total = $price * $quantity;
-                        $sumTotal += $total; 
-
+                // Begin header table
+                    $template .= Html::beginTag('thead');
                         $template .= Html::beginTag('tr');
-                            $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= Html::tag('span', $id, ['class' => 'product_id']);
-                                $template .= Html::hiddenInput($modelName . '[product][' . $id . '][id]', $id, ['class' => 'form-control', 'readonly' => true]);
+                            $template .= Html::beginTag('th');
+                                $template .= Yii::t('ecommerce', 'ID');
+                            $template .= Html::endTag('th');
+                            $template .= Html::beginTag('th');
+                                $template .= Yii::t('ecommerce', 'Sku');
+                            $template .= Html::endTag('th');
+                            $template .= Html::beginTag('th');
+                                $template .= Yii::t('ecommerce', 'Title');
+                            $template .= Html::endTag('th');
+                            $template .= Html::beginTag('th');
+                                $template .= Yii::t('ecommerce', 'Price');
+                            $template .= Html::endTag('th');
+                            $template .= Html::beginTag('th');
+                                $template .= Yii::t('ecommerce', 'Quantity');
+                            $template .= Html::endTag('th');
+                            $template .= Html::beginTag('th');
+                                $template .= Yii::t('ecommerce', 'Total Price');
+                            $template .= Html::endTag('th');
+                        $template .= Html::endTag('tr');
+                    $template .= Html::endTag('thead');
+                // End header table
+
+                // Begin list product
+                    $template .= Html::beginTag('tbody');
+                        $sumTotal = 0;
+                        foreach ($products as $product) {
+                            // Get value in product
+                            $id = ArrayHelper::getValue($product, 'id', '');
+                            $sku = ArrayHelper::getValue($product, 'sku', '');
+                            $title = ArrayHelper::getValue($product, 'title', '');
+                            $price = ArrayHelper::getValue($product, 'price', 0);
+                            $quantity = ArrayHelper::getValue($product, 'quantity', 0);
+                            $is_marketing = ArrayHelper::getValue($product, 'is_marketing', '1');
+                            $total = $price * $quantity;
+                            $sumTotal += $total; 
+
+                            $template .= Html::beginTag('tr');
+                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
+                                    $template .= Html::tag('span', $id, ['class' => 'product_id']);
+                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][id]', $id, ['class' => 'form-control', 'readonly' => true]);
+                                $template .= Html::endTag('td');
+                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
+                                    $template .= $sku;
+                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][sku]', $sku, ['class' => 'form-control', 'readonly' => true]);
+                                $template .= Html::endTag('td');
+                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
+                                    $template .= $title;
+                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][title]', $title, ['class' => 'form-control', 'readonly' => true]);
+                                $template .= Html::endTag('td');
+                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
+                                    $template .= Yii::$app->formatter->asDecimal($price, 0) . ' VNĐ';
+                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][price]', $price, ['class' => 'form-control product_price', 'readonly' => true]);
+                                $template .= Html::endTag('td');
+                                $template .= Html::beginTag('td', ['style' => 'width: 5%;']);
+                                    $template .= Html::textInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty text-center', 'onkeyup' => 'return totalPriceProduct(this);']);
+                                $template .= Html::endTag('td');
+                                $template .= Html::beginTag('td', ['class' => 'text-vertical', 'colspan' => 2]);
+                                    $template .= Html::tag('span', Yii::$app->formatter->asDecimal($total, 0) . ' VNĐ', ['class' => 'product_total', 'data-total' => $total]);
+                                $template .= Html::endTag('td');
+                            $template .= Html::endTag('tr');
+                        }
+                        
+                        // Begin shipping
+                        $template .= Html::beginTag('tr');
+                            $template .= Html::beginTag('td', ['colspan' => '5', 'class' => 'text-right', 'style' => 'vertical-align: middle;']);
+                                $template .= Yii::t('ecommerce', 'Shipping') . ': ';
                             $template .= Html::endTag('td');
-                            $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= $sku;
-                                $template .= Html::hiddenInput($modelName . '[product][' . $id . '][sku]', $sku, ['class' => 'form-control', 'readonly' => true]);
+                            $template .= Html::beginTag('td', ['width' => '100px']);
+                                $template .= Html::textInput('shipping', Yii::$app->formatter->asDecimal($shipping, 0), ['class' => 'form-control pull-left', 'onkeyup' => 'return addShipping(this);']);
+                                $template .= Html::hiddenInput($modelName . '[shipping]', $shipping, ['id' => 'syaShipping','class' => 'form-control product_total', 'readonly' => true, 'data-total' => $shipping]);
                             $template .= Html::endTag('td');
-                            $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= $title;
-                                $template .= Html::hiddenInput($modelName . '[product][' . $id . '][title]', $title, ['class' => 'form-control', 'readonly' => true]);
-                            $template .= Html::endTag('td');
-                            $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= Yii::$app->formatter->asDecimal($price, 0) . ' VNĐ';
-                                $template .= Html::hiddenInput($modelName . '[product][' . $id . '][price]', $price, ['class' => 'form-control product_price', 'readonly' => true]);
-                            $template .= Html::endTag('td');
-                            $template .= Html::beginTag('td');
-                                $template .= Html::textInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty', 'onkeyup' => 'return totalPriceProduct(this);']);
-                            $template .= Html::endTag('td');
-                            $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                $template .= Html::tag('span', Yii::$app->formatter->asDecimal($total, 0) . ' VNĐ', ['class' => 'product_total', 'data-total' => $total]);
+                            $template .= Html::beginTag('td', ['style' => 'vertical-align: middle;']);
+                                $template .= ' VNĐ';
                             $template .= Html::endTag('td');
                         $template .= Html::endTag('tr');
-                    }
-                $template .= Html::endTag('tbody');
-            // End list product
+                        // End shipping
+                        
+                        // Begin total product
+                        $template .= Html::beginTag('tr');
+                            $template .= Html::beginTag('td', ['colspan' => '5', 'class' => 'text-right']);
+                                $template .= Yii::t('ecommerce', 'Total') . ': ';
+                            $template .= Html::endTag('td');
+                            $template .= Html::beginTag('td', ['colspan' => '2']);
+                                $template .= Html::tag('span', Yii::$app->formatter->asDecimal($sumTotal + $shipping, 0), ['id' => 'product_total']) . ' VNĐ';
+                            $template .= Html::endTag('td');
+                        $template .= Html::endTag('tr');
+                        // End total product
+                        
+                    $template .= Html::endTag('tbody');
+                // End list product
 
-            $template .= Html::endTag('table');
-            // End list product order
-
-            // Begin total product
-            $template .= Html::beginTag('div', ['class' => 'row']);
-                $template .= Html::beginTag('div', ['class' => 'col-sm-12 m-b-xs text-right']);
-                    $template .= 'Tổng tiền: ' . Html::tag('span', Yii::$app->formatter->asDecimal($sumTotal, 0), ['id' => 'product_total']) . ' VNĐ';
-                $template .= Html::endTag('div');
-            $template .= Html::endTag('div');
-            // End total product
+                $template .= Html::endTag('table');
+                // End list product order
+                
+            $template .= Html::endTag('div'); // End table-responsive
             
             return $template;
         }

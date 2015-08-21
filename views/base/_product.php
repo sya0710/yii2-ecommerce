@@ -163,10 +163,11 @@ $this->registerJs("
     
     // Add product in order
     function addProduct(){
+        var shipping = $('#syaShipping').val();
         $.ajax({
             url: '" . \yii\helpers\Url::to(['/ecommerce/ajax/addproduct']) . "',
             type: 'post',
-            data: {data: $('#product_list').val()},
+            data: {data: $('#product_list').val(), shipping: shipping},
         }).done(function (data) {
             $('#product_info').html(data);
             totalProduct();

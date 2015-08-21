@@ -169,7 +169,7 @@ $form = ActiveForm::begin([
                                 <br/>
                                 <small class="text-navy"><?= Yii::$app->formatter->asRelativeTime($created_at->sec) ?></small>
                             </div>
-                            <div class="col-xs-9 content no-top-border">
+                            <div class="col-xs-7 content no-top-border">
                                 <p class="m-b-xs"><strong><?= ucfirst($action); ?></strong></p>
                                 <p><?= $logCreator . ' ' . $note; ?></p>
                             </div>
@@ -263,6 +263,22 @@ $this->registerJs("
         });
 
         $('#product_total').text(formatNumber(product_total));
+    }
+    
+    function addShipping(element){
+        var shipping = $(element);
+        var price = parseInt(shipping.val().replace(/,/g, ''));
+        if (price){
+            shipping.val(formatNumber(price));
+            $('#syaShipping').val(price);
+            $('#syaShipping').attr('data-total', price);
+        } else {
+            shipping.val(0);
+            $('#syaShipping').val(0);
+            $('#syaShipping').attr('data-total', 0);
+        }
+            
+        totalProduct();
     }
 ", yii\web\View::POS_END);
 ?>

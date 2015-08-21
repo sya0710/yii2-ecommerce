@@ -16,6 +16,7 @@ class AjaxController extends \yii\web\Controller{
     public function actionAddproduct(){
         // List product include: id of product and quantity of product.
         $data = Yii::$app->request->post('data');
+        $shipping = Yii::$app->request->post('shipping', 0);
         $products = explode(',', $data);
         $list_product = [];
         
@@ -61,7 +62,7 @@ class AjaxController extends \yii\web\Controller{
             }
             
             $modelOrder = new $ecommerce->itemModule;
-            echo $modelOrder->generateProductOrder($list_product);
+            echo $modelOrder->generateProductOrder($list_product, $shipping);
         }
     }
     
