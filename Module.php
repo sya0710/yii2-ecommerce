@@ -210,6 +210,9 @@ class Module extends \yii\base\Module{
             ],
         ];
 
+        if (!isset($allStatus[$status]))
+            $status = self::STATUS_NEW;
+        
         return array_diff_key(self::$status, array_flip($allStatus[$status]));
     }
     

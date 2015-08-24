@@ -95,7 +95,7 @@ class BaseController extends \yii\web\Controller{
      */
     public function actionDelete($id){
         $model = $this->findModel($id);
-        $model->status = '';
+        $model->status = \sya\ecommerce\Module::STATUS_EMPTY;
         $model->save();
         
         return $this->redirect(['index']);

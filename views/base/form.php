@@ -153,29 +153,7 @@ $form = ActiveForm::begin([
                 <h5><?= Yii::t('ecommerce', 'Log order') ?></h5>
             </div>
             <div class="ibox-content inspinia-timeline" id='syaTimeline'>
-                <?php if (!empty($model->log)): foreach ($model->log as $log): ?>
-                    <?php 
-                        // Declare infomation log
-                        $created_at = ArrayHelper::getValue($log, 'created_at');
-                        $action = ArrayHelper::getValue($log, 'action');
-                        $note = ArrayHelper::getValue($log, 'note');
-                        $logCreator = ArrayHelper::getValue($log, 'creator_name');
-                    ?>
-                    <div class="timeline-item">
-                        <div class="row">
-                            <div class="col-xs-3 date">
-                                <i class="fa <?= ArrayHelper::getValue(\sya\ecommerce\Module::$logStatus, $action) ?>"></i>
-                                    <?= date('H:i a', $created_at->sec); ?>
-                                <br/>
-                                <small class="text-navy"><?= Yii::$app->formatter->asRelativeTime($created_at->sec) ?></small>
-                            </div>
-                            <div class="col-xs-7 content no-top-border">
-                                <p class="m-b-xs"><strong><?= ucfirst($action); ?></strong></p>
-                                <p><?= $logCreator . ' ' . $note; ?></p>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; endif; ?>
+               <?= $model->generateLogOrder(); ?>
             </div>
         </div>
     </div>

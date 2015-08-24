@@ -272,4 +272,46 @@ class Order extends BaseOrder
         
         return $template;
     }
+    
+    /**
+     * Function generate log order
+     * @return string
+     */
+    public function generateLogOrder(){
+        $template = null;
+        if (is_array($this->log) AND !empty($this->log)){
+            foreach ($this->log as $log){
+                // Declare infomation log
+                $created_at = ArrayHelper::getValue($log, 'created_at');
+                $action = ArrayHelper::getValue($log, 'action');
+                $note = ArrayHelper::getValue($log, 'note');
+                $creator = ArrayHelper::getValue($log, 'creator');
+                $logCreator = ArrayHelper::getValue($log, 'creator_name');
+                
+                // Get namespace of model
+                $ecommerce = Ecommerce::module();
+
+                // User field
+                $linkUser = ArrayHelper::getValue($ecommerce->userTable, 'linkInfo');
+                $idUser = ArrayHelper::getValue($ecommerce->userTable, 'idField');
+                
+                $template .= Html::beginTag('div', ['class' => 'timeline-item']);
+                    $template .= Html::beginTag('div', ['class' => 'row']);
+                        $template .= Html::beginTag('div', ['class' => 'col-xs-3 date']);
+                            $template .= Html::tag('i', '', ['class' => 'fa ' . ArrayHelper::getValue(\sya\ecommerce\Module::$logStatus, $action)]);
+                                $template .= date('H:i a', $created_at->sec);
+                                $template .= Html::tag('br');
+                                $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at->sec), ['class' => 'text-navy']);
+                        $template .= Html::endTag('div');
+                        $template .= Html::beginTag('div', ['class' => 'col-xs-7 content no-top-border']);
+                                $template .= Html::tag('p', Html::tag('strong', ucfirst($action)), ['class' => 'm-b-xs']);
+                                $template .= Html::tag('p', Html::a($logCreator, Url::to([$linkUser, $idUser => $creator])) . ' ' . $note);
+                        $template .= Html::endTag('div');
+                    $template .= Html::endTag('div');
+                $template .= Html::endTag('div');
+            }
+        }
+        
+        return $template;
+    }
 }

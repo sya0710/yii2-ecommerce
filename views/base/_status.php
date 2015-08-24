@@ -13,43 +13,27 @@ use sya\ecommerce\Module;
 
 <!-- Begin register file and code js, css -->
 <?php
-$this->registerCssFile('@web/vendor/bower/sweetalert/dist/sweetalert.css', ['depends' => yii\bootstrap\BootstrapAsset::className()]);
-$this->registerJsFile('@web/vendor/bower/sweetalert/dist/sweetalert.min.js', ['depends' => yii\bootstrap\BootstrapPluginAsset::className(), 'position' => \yii\web\View::POS_END]);
-
 $this->registerJs("
     // Function change status order
     function changeStatusOrder(element){
         var status = $(element).val();
         var id = '" . $model->_id . "';
         if (status != '" . Module::STATUS_CANCEL . "') {
-            swal({
-                title: '" . Yii::t('yii', 'Are you sure?') . "',
-                text: 'Your will not be able to recover this imaginary file!',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#DD6B55',
-                confirmButtonText: 'Yes, change it!',
-                cancelButtonText: 'No, cancel plx!',
-                closeOnConfirm: false,
-                closeOnCancel: false },
-            function (isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: '" . \yii\helpers\Url::to(['/ecommerce/ajax/changestatus']) . "',
-                        type: 'post',
-                        dataType: 'json',
-                        data: {status: status, id: id},
-                    }).done(function (data) {
-                        swal('Change!', 'Your imaginary file has been change.', 'success');
-                        $(element).empty();
-                        $.each(data, function(key, value) {
-                            $(element).append( new Option(value, key) );
-                        });
+            var confirmChange = confirm('" . Yii::t('ecommerce', 'Are you sure?') . "');
+            if (confirmChange == true){
+                $.ajax({
+                    url: '" . \yii\helpers\Url::to(['/ecommerce/ajax/changestatus']) . "',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {status: status, id: id},
+                }).done(function (data) {
+                    $(element).empty();
+                    $.each(data.status, function(key, value) {
+                        $(element).append( new Option(value, key) );
                     });
-                } else {
-                    swal('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
+                    $('#syaTimeline').html(data.log);
+                });
+            }
         }
     }
 ", yii\web\View::POS_END);

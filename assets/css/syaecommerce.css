@@ -23,3 +23,4 @@ and open the template in the editor.
 .m-t {margin-top: 15px;}
 #note_admin {max-height: 410px; overflow: auto;}
 #syaTimeline {max-height: 416px; overflow: auto;}
+#product-grid-container table tbody tr {cursor: pointer;}
