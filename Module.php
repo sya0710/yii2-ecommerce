@@ -59,14 +59,9 @@ class Module extends \yii\base\Module{
     public $itemModule = '\sya\ecommerce\models\Order';
     
     /**
-     * @var string namespace of product 
+     * @var array product config in your table product
      */
-    public $productModule = '';
-    
-    /**
-     * @var array product column in gridview
-     */
-    public $productColumns = [];
+    public $productTable = [];
     
     /**
      * @var array User infomation in your table user

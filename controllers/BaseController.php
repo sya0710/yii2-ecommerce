@@ -22,10 +22,13 @@ class BaseController extends \yii\web\Controller{
     public function actionCreate(){
         // Get namespace of model
         $ecommerce = Ecommerce::module();
+        
+        $productModule = ArrayHelper::getValue($ecommerce->productTable, 'productModule');
+        
         // Check have exists product module namespace
-        if (!empty($ecommerce->productModule)){
+        if (!empty($productModule)){
             $queryParams = Yii::$app->request->getQueryParams();
-            $productSearchModel = new $ecommerce->productModule;
+            $productSearchModel = new $productModule;
             $productSearchModel->scenario = 'search';
             $productDataProvider = $productSearchModel->search($queryParams);
         } else {
@@ -48,7 +51,7 @@ class BaseController extends \yii\web\Controller{
             'model' => $model,
             'productSearchModel' => $productSearchModel,
             'productDataProvider' => $productDataProvider,
-            'productColumns' => $ecommerce->productColumns,
+            'productColumns' => ArrayHelper::getValue($ecommerce->productTable, 'productColumns'),
             'template' => $model->generateProductOrder()
         ]);
     }
@@ -56,10 +59,13 @@ class BaseController extends \yii\web\Controller{
     public function actionUpdate($id){
         // Get namespace of model
         $ecommerce = Ecommerce::module();
+        
+        $productModule = ArrayHelper::getValue($ecommerce->productTable, 'productModule');
+        
         // Check have exists product module namespace
-        if (!empty($ecommerce->productModule)){
+        if (!empty($productModule)){
             $queryParams = Yii::$app->request->getQueryParams();
-            $productSearchModel = new $ecommerce->productModule;
+            $productSearchModel = new $productModule;
             $productSearchModel->scenario = 'search';
             $productDataProvider = $productSearchModel->search($queryParams);
         } else {
@@ -82,7 +88,7 @@ class BaseController extends \yii\web\Controller{
             'model' => $model,
             'productSearchModel' => $productSearchModel,
             'productDataProvider' => $productDataProvider,
-            'productColumns' => $ecommerce->productColumns,
+            'productColumns' => ArrayHelper::getValue($ecommerce->productTable, 'productColumns'),
             'template' => $model->generateProductOrder($model->product, $model->shipping)
         ]);
     }

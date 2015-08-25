@@ -126,6 +126,9 @@ class Order extends BaseOrder
             // Get model name of product
             $ecommerce = Ecommerce::module();
             $modelName = end(explode('\\', $ecommerce->itemModule));
+            
+            // Field product when add order column product
+            $productFieldOrder = ArrayHelper::getValue($ecommerce->productTable, 'fileOrder');
 
             // Begin list product order
             $template = Html::beginTag('div', ['class' => 'table-responsive']);

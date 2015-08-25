@@ -170,14 +170,34 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
      * @return array
      */
     protected function getValueAtributeArray($attribute, $attributeNew, $changeValue = [], $name = ''){
-        foreach ($attributeNew as $key => $items) {
+        // Check if length $attribute > $attributeNew then key not exits is delete. If length $attributeNew > $attribute then key not exits is add
+        if (count($attribute) > count($attributeNew)){
+            // Action when have key not exits in $attributeLong
+            $action = 'Delete';
+            
+            // Attribute have long length
+            $attributeLong = $attribute;
+            
+            // Attribute have small length
+            $attributeSmall = $attributeNew;
+        } else {
+            $action = 'Add';
+            $attributeLong = $attributeNew;
+            $attributeSmall = $attribute;
+        }
+        
+        foreach ($attributeLong as $key => $items) {
             if (is_array($items)){
-                $changeValue = $this->getValueAtributeArray($attribute[$key], $items, $changeValue, $key);
+                if (isset($attributeSmall[$key]))
+                    $changeValue = $this->getValueAtributeArray($items, $attributeSmall[$key], $changeValue, $key);
+                else
+                    $changeValue[] = Html::tag('li', $action . ' id: ' . $key . '');
             } else {
-                foreach ($attributeNew as $keyItem => $item) {
-                    $itemOldValue = ArrayHelper::getValue($attribute, $keyItem, $this->getAttributeLabel($keyItem));
-                    if ($item !== $itemOldValue){
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($keyItem) . ' of ' . $name . ' from ' . $itemOldValue . ' to ' . $item);
+                foreach ($attributeLong as $keyItem => $item) {
+                    $itemNewValue = ArrayHelper::getValue($attributeSmall, $keyItem, $this->getAttributeLabel($keyItem));
+                        
+                    if ($item !== $itemNewValue){
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($keyItem) . ' of ' . $name . ' from ' . $item . ' to ' . $itemNewValue);
                         break;
                     }
                 }

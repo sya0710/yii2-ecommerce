@@ -17,31 +17,38 @@ use sya\gallery\Module;
     'ecommerce' => [
         'class' => 'sya\ecommerce\Module',
         'itemModule' => 'sya\ecommerce\models\Order',
-        'productModule' => 'app\modules\product\models\Product',
-        'productColumns' => [
-            [
-                'attribute' => 'sku',
-                'hAlign'=>'center',
-                'vAlign'=>'middle',
+        'productTable' => [
+            'productModule' => 'app\modules\product\models\Product',
+            'productColumns' => [
+                [
+                    'attribute' => 'sku',
+                    'hAlign'=>'center',
+                    'vAlign'=>'middle',
+                ],
+                [
+                    'attribute' => 'title',
+                    'hAlign'=>'center',
+                    'vAlign'=>'middle',
+                ],
+                [
+                    'attribute' => 'price',
+                    'hAlign'=>'center',
+                    'vAlign'=>'middle',
+                    'format'=>['decimal', 0],
+                ],
+                [
+                    'class'=>'kartik\grid\BooleanColumn',
+                    'attribute'=>'status', 
+                    'vAlign'=>'middle',
+                    'format'=>'raw',
+                    'trueLabel' => 'Hiện',
+                    'falseLabel' => 'Ẩn'
+                ]
             ],
-            [
-                'attribute' => 'title',
-                'hAlign'=>'center',
-                'vAlign'=>'middle',
-            ],
-            [
-                'attribute' => 'price',
-                'hAlign'=>'center',
-                'vAlign'=>'middle',
-                'format'=>['decimal', 0],
-            ],
-            [
-                'class'=>'kartik\grid\BooleanColumn',
-                'attribute'=>'status', 
-                'vAlign'=>'middle',
-                'format'=>'raw',
-                'trueLabel' => 'Hiện',
-                'falseLabel' => 'Ẩn'
+            'fileOrder' => [
+                'title',
+                'sku',
+                'price',
             ]
         ]
     ],

@@ -42,7 +42,10 @@ class AjaxController extends \yii\web\Controller{
             $ecommerce = Ecommerce::module();
             
             // Namespace of product model
-            $productModel = $ecommerce->productModule;
+            $productModel = ArrayHelper::getValue($ecommerce->productTable, 'productModule');
+            
+            // Field product when add order column product
+            $productFieldOrder = ArrayHelper::getValue($ecommerce->productTable, 'fileOrder');
             
             // Get infomation of product
             $model = $productModel::find()->where([
@@ -52,12 +55,10 @@ class AjaxController extends \yii\web\Controller{
             ])->all();
             
             foreach ($model as $product) {
-                $productInfomation = [
-                    'title' => $product->title,
-                    'sku' => $product->sku,
-                    'price' => $product->price,
-                    'is_marketing' => $product->is_marketing,
-                ];
+                $productInfomation = [];
+                foreach ($productFieldOrder as $item) {
+                    $productInfomation[$item] = $product->$item;
+                }
                 $list_product[$product->_id] = ArrayHelper::merge($list_product[$product->_id], $productInfomation);
             }
             
