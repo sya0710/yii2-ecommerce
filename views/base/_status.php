@@ -33,6 +33,8 @@ $this->registerJs("
                     });
                     $('#syaTimeline').html(data.log);
                 });
+            } else {
+                $(element).val('" . Module::STATUS_EMPTY . "');
             }
         }
     }
