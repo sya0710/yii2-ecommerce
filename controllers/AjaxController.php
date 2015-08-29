@@ -45,7 +45,7 @@ class AjaxController extends \yii\web\Controller{
             $productModel = ArrayHelper::getValue($ecommerce->productTable, 'productModule');
             
             // Field product when add order column product
-            $productFieldOrder = ArrayHelper::getValue($ecommerce->productTable, 'fileOrder');
+            $productFieldOrder = ArrayHelper::getValue($ecommerce->productTable, 'fieldOrder');
             
             // Get infomation of product
             $model = $productModel::find()->where([
@@ -56,8 +56,8 @@ class AjaxController extends \yii\web\Controller{
             
             foreach ($model as $product) {
                 $productInfomation = [];
-                foreach ($productFieldOrder as $item) {
-                    $productInfomation[$item] = $product->$item;
+                foreach ($productFieldOrder as $key => $item) {
+                    $productInfomation[$key] = $product->$item;
                 }
                 $list_product[$product->_id] = ArrayHelper::merge($list_product[$product->_id], $productInfomation);
             }

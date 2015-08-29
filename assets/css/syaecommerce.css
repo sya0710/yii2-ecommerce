@@ -20,6 +20,7 @@ and open the template in the editor.
 .timeline-item .content {border-left: 1px solid #e7eaec; border-top: 1px solid #e7eaec; padding-top: 10px; min-height: 100px;}
 .no-top-border {border-top: 0 !important;}
 .m-b-xs {margin-bottom: 5px;}
+.m-b {margin-bottom: 15px;}
 .m-t {margin-top: 15px;}
 #note_admin {max-height: 410px; overflow: auto;}
 #syaTimeline {max-height: 416px; overflow: auto;}

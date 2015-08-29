@@ -69,11 +69,17 @@ $form = ActiveForm::begin([
             <div class="ibox-title">
                 <h5><?= Yii::t('ecommerce', 'Infomation Customer') ?></h5>
                 <div class="ibox-tools">
-                    <?= $this->render('_customer'); ?>
+                    <?= $this->render('_customer', [
+                        'customerSearchModel' => $customerSearchModel,
+                        'customerDataProvider' => $customerDataProvider,
+                        'customerColumns' => $customerColumns,
+                        'form' => $form,
+                        'model' => $model,
+                    ]); ?>
                 </div>
             </div>
             <div class="ibox-content">
-                
+                <?= $templateCustomer; ?>
             </div>
         </div>
     </div>

@@ -111,7 +111,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             foreach ($attributeNews as $attribute => $attributeValue) {
                 if (isset($oldAttributes[$attribute]) AND ($oldAttributes[$attribute] !== $attributeValue)){
                     if (!is_array($oldAttributes[$attribute]))
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . ' from ' . $oldAttributes[$attribute] . ' to ' . $attributeValue);
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . ' from ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldAttributes[$attribute]))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $attributeValue))));
                     else{
                         $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . '' . Html::tag('ul', implode('', $this->getValueAtributeArray($oldAttributes[$attribute], $attributeValue))));
                     }
@@ -197,7 +197,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     $itemNewValue = ArrayHelper::getValue($attributeSmall, $keyItem, $this->getAttributeLabel($keyItem));
                         
                     if ($item !== $itemNewValue){
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($keyItem) . ' of ' . $name . ' from ' . $item . ' to ' . $itemNewValue);
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($keyItem) . ' of ' . $name . ' from ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $item))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $itemNewValue))));
                         break;
                     }
                 }

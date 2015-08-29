@@ -23,17 +23,23 @@ class BaseController extends \yii\web\Controller{
         // Get namespace of model
         $ecommerce = Ecommerce::module();
         
+        // Get namespace product
         $productModule = ArrayHelper::getValue($ecommerce->productTable, 'productModule');
         
-        // Check have exists product module namespace
-        if (!empty($productModule)){
-            $queryParams = Yii::$app->request->getQueryParams();
-            $productSearchModel = new $productModule;
-            $productSearchModel->scenario = 'search';
-            $productDataProvider = $productSearchModel->search($queryParams);
-        } else {
-            throw new \yii\base\Exception('Module products that have not been declared.', '500');
-        }
+        // Get search function product
+        $productSearch = ArrayHelper::getValue($ecommerce->productTable, 'productSearch', 'search');
+        
+        // Get data product
+        $productData = $this->getGridViewModel($productModule, $productSearch);
+        
+        // Get namespace customer
+        $customerModule = ArrayHelper::getValue($ecommerce->customerTable, 'customerModule');
+        
+        // Get search function customer
+        $customerSearch = ArrayHelper::getValue($ecommerce->customerTable, 'customerSearch', 'search');
+        
+        // Get data customer
+        $customerData = $this->getGridViewModel($customerModule, $customerSearch);
         
         // Order module load
         $model = new $ecommerce->itemModule;
@@ -49,10 +55,13 @@ class BaseController extends \yii\web\Controller{
         
         return $this->render('@vendor/sya/yii2-ecommerce/views/base/form', [
             'model' => $model,
-            'productSearchModel' => $productSearchModel,
-            'productDataProvider' => $productDataProvider,
-            'productColumns' => ArrayHelper::getValue($ecommerce->productTable, 'productColumns'),
-            'template' => $model->generateProductOrder()
+            'productSearchModel' => ArrayHelper::getValue($productData, 'searchModel'),
+            'productDataProvider' => ArrayHelper::getValue($productData, 'dataProvider'),
+            'customerSearchModel' => ArrayHelper::getValue($customerData, 'searchModel'),
+            'customerDataProvider' => ArrayHelper::getValue($customerData, 'dataProvider'),
+            'productColumns' => ArrayHelper::getValue($ecommerce->productTable, 'productColumns', []),
+            'customerColumns' => ArrayHelper::getValue($ecommerce->customerTable, 'customerColumns', []),
+            'template' => $model->generateProductOrder($model->product, $model->shipping)
         ]);
     }
     
@@ -60,17 +69,23 @@ class BaseController extends \yii\web\Controller{
         // Get namespace of model
         $ecommerce = Ecommerce::module();
         
+        // Get namespace product
         $productModule = ArrayHelper::getValue($ecommerce->productTable, 'productModule');
         
-        // Check have exists product module namespace
-        if (!empty($productModule)){
-            $queryParams = Yii::$app->request->getQueryParams();
-            $productSearchModel = new $productModule;
-            $productSearchModel->scenario = 'search';
-            $productDataProvider = $productSearchModel->search($queryParams);
-        } else {
-            throw new \yii\base\Exception('Module products that have not been declared.', '500');
-        }
+        // Get search function product
+        $productSearch = ArrayHelper::getValue($ecommerce->productTable, 'productSearch', 'search');
+        
+        // Get data product
+        $productData = $this->getGridViewModel($productModule, $productSearch);
+        
+        // Get namespace customer
+        $customerModule = ArrayHelper::getValue($ecommerce->customerTable, 'customerModule');
+        
+        // Get search function customer
+        $customerSearch = ArrayHelper::getValue($ecommerce->customerTable, 'customerSearch', 'search');
+        
+        // Get data customer
+        $customerData = $this->getGridViewModel($customerModule, $customerSearch);
         
         // Order module load
         $model = $this->findModel($id);
@@ -86,10 +101,14 @@ class BaseController extends \yii\web\Controller{
         
         return $this->render('@vendor/sya/yii2-ecommerce/views/base/form', [
             'model' => $model,
-            'productSearchModel' => $productSearchModel,
-            'productDataProvider' => $productDataProvider,
-            'productColumns' => ArrayHelper::getValue($ecommerce->productTable, 'productColumns'),
-            'template' => $model->generateProductOrder($model->product, $model->shipping)
+            'productSearchModel' => ArrayHelper::getValue($productData, 'searchModel'),
+            'productDataProvider' => ArrayHelper::getValue($productData, 'dataProvider'),
+            'customerSearchModel' => ArrayHelper::getValue($customerData, 'searchModel'),
+            'customerDataProvider' => ArrayHelper::getValue($customerData, 'dataProvider'),
+            'productColumns' => ArrayHelper::getValue($ecommerce->productTable, 'productColumns', []),
+            'customerColumns' => ArrayHelper::getValue($ecommerce->customerTable, 'customerColumns', []),
+            'template' => $model->generateProductOrder($model->product, $model->shipping),
+            'templateCustomer' => $model->generateCustomerOrder()
         ]);
     }
     
@@ -122,6 +141,30 @@ class BaseController extends \yii\web\Controller{
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider
         ];
+    }
+    
+    /**
+     * Function get data of module
+     * @param type $module Namespace of module
+     * @param type $functionName Name of function return data module
+     * @return array Array search model and dataprovider of $module
+     * @throws \yii\base\Exception
+     */
+    protected function getGridViewModel($module, $functionName) {
+        // Check have exists product module namespace
+        if (!empty($module)){
+            $queryParams = Yii::$app->request->getQueryParams();
+            $searchModel = new $module;
+            $searchModel->scenario = 'search';
+            $dataProvider = $searchModel->$functionName($queryParams);
+            
+            return [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider
+            ];
+        } else {
+            throw new \yii\base\Exception('Module that have not been declared.', '500');
+        }
     }
 
     /**

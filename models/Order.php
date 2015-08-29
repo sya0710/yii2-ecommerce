@@ -20,19 +20,14 @@ use sya\ecommerce\helpers\SyaHelper;
  * @property mixed $updater
  * @property mixed $updated_at
  * @property mixed $status
- * @property mixed $product: infomation of product when shopping
+ * @property mixed $product infomation of product when shopping
  * - id: id of product.
  * - sku: sku of product.
  * - price: price of product when ordering at that time. (No change when price of product change).
  * - quantity: quantity order of product.
  * - is_marketing: promotional products or not at the time. (No change)
  * @property mixed $shipping
- * @property mixed $customer: infomation of customer when shopping
- * - id: id of customer.
- * - buyer: people buy products.
- * - address: address of customer.
- * - phone: phone of customer.
- * - email: email of customer.
+ * @property mixed $customer infomation of customer when shopping
  * @property mixed $payment
  * @property mixed $note_customer
  * @property mixed $note_admin
@@ -126,9 +121,6 @@ class Order extends BaseOrder
             // Get model name of product
             $ecommerce = Ecommerce::module();
             $modelName = end(explode('\\', $ecommerce->itemModule));
-            
-            // Field product when add order column product
-            $productFieldOrder = ArrayHelper::getValue($ecommerce->productTable, 'fileOrder');
 
             // Begin list product order
             $template = Html::beginTag('div', ['class' => 'table-responsive']);
@@ -237,6 +229,24 @@ class Order extends BaseOrder
         }
         
         return null;
+    }
+    
+    public function generateCustomerOrder(){
+        $ecommerce = Ecommerce::module();
+        
+        // Customer field
+        $customerField = ArrayHelper::getValue($ecommerce->customerTable, 'fieldOrder');
+        
+        // Model order
+        $modelOrder = end(explode('\\', $ecommerce->itemModule));
+        
+        $template = '';
+        foreach ($customerField as $filedCustomerOrder => $fieldCustomerTable) {
+            $placeHolder = Yii::t('ecommerce', ucwords(str_replace('_', ' ', $filedCustomerOrder)));
+            $template .= Html::textInput($modelOrder . '[customer][' . $filedCustomerOrder . ']', ArrayHelper::getValue($this->customer, $filedCustomerOrder, ''), ['class' => 'form-control m-b', 'placeHolder' => $placeHolder]);
+        }
+        
+        return $template;
     }
     
     /**

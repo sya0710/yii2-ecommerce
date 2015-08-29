@@ -461,6 +461,8 @@ HTML;
                                             element.find('.syaSelectStatus').append( new Option(value, key) );
                                         });
                                     });
+                                } else {
+                                    element.find('.syaSelectStatus').val('" . Module::STATUS_EMPTY . "');
                                 }
                             }",
                         ]

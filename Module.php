@@ -24,8 +24,8 @@ class Module extends \yii\base\Module{
     CONST STATUS_NEW = 'new';
     CONST STATUS_PROCESS = 'processing';
     CONST STATUS_PENDING = 'pending';
-    CONST STATUS_GOOSHAD = 'goodshad';
-    CONST STATUS_MOVE = 'movedtoshop';
+    CONST STATUS_GOOSHAD = 'goods_had';
+    CONST STATUS_MOVE = 'moved_to_shop';
     CONST STATUS_DELIVERY = 'delivery';
     CONST STATUS_PAID = 'paid';
     CONST STATUS_COMPLETE = 'complete';
@@ -73,6 +73,11 @@ class Module extends \yii\base\Module{
     ];
     
     /**
+     * @var array customer config in your table customer
+     */
+    public $customerTable = [];
+    
+    /**
      * @inherit doc
      */
     public function init()
@@ -97,7 +102,7 @@ class Module extends \yii\base\Module{
             self::STATUS_PROCESS => Yii::t('ecommerce', 'Processing'),
             self::STATUS_PENDING => Yii::t('ecommerce', 'Pending'),
             self::STATUS_GOOSHAD => Yii::t('ecommerce', 'Goods Had'),
-            self::STATUS_MOVE => Yii::t('ecommerce', 'Moved to shop'),
+            self::STATUS_MOVE => Yii::t('ecommerce', 'Moved To Shop'),
             self::STATUS_DELIVERY => Yii::t('ecommerce', 'Delivery'),
             self::STATUS_PAID => Yii::t('ecommerce', 'Paid'),
             self::STATUS_COMPLETE => Yii::t('ecommerce', 'Complete'),
