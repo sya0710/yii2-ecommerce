@@ -457,7 +457,7 @@ HTML;
                                     }).done(function (data) {
                                         element.find('.syaStatus').text(status[val]);
                                         element.find('.syaSelectStatus').empty();
-                                        $.each(data, function(key, value) { 
+                                        $.each(data.status, function(key, value) {
                                             element.find('.syaSelectStatus').append( new Option(value, key) );
                                         });
                                     });
