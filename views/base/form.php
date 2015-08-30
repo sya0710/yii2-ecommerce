@@ -75,6 +75,7 @@ $form = ActiveForm::begin([
                         'customerColumns' => $customerColumns,
                         'form' => $form,
                         'model' => $model,
+                        'customerField' => $customerField,
                     ]); ?>
                 </div>
             </div>

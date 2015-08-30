@@ -18,6 +18,7 @@ $defaultColumns = [
 $customerColumns = ArrayHelper::merge($defaultColumns, $customerColumns);
     
 Modal::begin([
+    'id' => 'customer_modal',
     'header' => '<h4 class="modal-title" id="myModalLabel">' . Yii::t('ecommerce', 'List Customer') . '</h4>',
     'size' => 'modal-lg',
     'toggleButton' => [
@@ -29,7 +30,7 @@ Modal::begin([
 
 echo GridView::widget([
     'panel' => [
-        'heading' => Yii::t('product', 'Product'),
+        'heading' => Yii::t('ecommerce', 'Customer'),
     ],
     'id' => 'customer-grid',
     'pjax' => TRUE,
@@ -43,4 +44,27 @@ echo GridView::widget([
 ]);
 
 Modal::end();
+
+$js = [];
+foreach ($customerField as $customerFiled => $customerColumn) {
+    $js[] = '$(".customer_input_' . $customerColumn . '").val($(this).find(".customer_' . $customerColumn . '").text());';
+}
+
+// Register js code
+$this->registerJs("
+    // Add or remove product when click product
+    function customerOrder(){
+        $('#customer-grid-container table tbody tr').click(function(){
+            " . implode("\n", $js) . "
+            $('#customer_modal').modal('hide');
+        });
+    }
+", yii\web\View::POS_END);
+
+$this->registerJs("
+    customerOrder();
+    $(document).on('pjax:complete', function () {
+        customerOrder();
+    });
+", yii\web\View::POS_READY);
 ?>

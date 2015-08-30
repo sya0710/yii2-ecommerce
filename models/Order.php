@@ -243,7 +243,7 @@ class Order extends BaseOrder
         $template = '';
         foreach ($customerField as $filedCustomerOrder => $fieldCustomerTable) {
             $placeHolder = Yii::t('ecommerce', ucwords(str_replace('_', ' ', $filedCustomerOrder)));
-            $template .= Html::textInput($modelOrder . '[customer][' . $filedCustomerOrder . ']', ArrayHelper::getValue($this->customer, $filedCustomerOrder, ''), ['class' => 'form-control m-b', 'placeHolder' => $placeHolder]);
+            $template .= Html::textInput($modelOrder . '[customer][' . $filedCustomerOrder . ']', ArrayHelper::getValue($this->customer, $filedCustomerOrder, ''), ['class' => 'form-control m-b customer_input_' . $fieldCustomerTable, 'placeHolder' => $placeHolder]);
         }
         
         return $template;

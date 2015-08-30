@@ -21,18 +21,6 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         
         // User name field
         $username = ArrayHelper::getValue($ecommerce->userTable, 'nameField');
-
-        // ID
-        if ($this->isNewRecord AND empty($this->_id))
-            $this->_id = uniqid();
-        
-        // ecommerce_id
-        if ($this->isNewRecord AND empty($this->ecommerce_id))
-            $this->ecommerce_id = uniqid('EM');
-        
-        // status
-        if ($this->isNewRecord AND empty($this->status))
-            $this->status = $ecommerce::STATUS_NEW;
         
         // date time
         $now = new MongoDate();
@@ -41,18 +29,30 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         if (in_array('updated_at', $attributes))
             $this->updated_at = $now;
         
-        // creator
         if ($this->isNewRecord) {
+            // creator
             if (in_array('creator', $attributes))
                 $this->creator = Yii::$app->user->id;
+            
+            // ID
+            if (empty($this->_id))
+                $this->_id = uniqid();
+
+            // ecommerce_id
+            if (empty($this->ecommerce_id))
+                $this->ecommerce_id = uniqid('EM');
+
+            // status
+            if (empty($this->status))
+                $this->status = $ecommerce::STATUS_NEW;
         }
         
         // Write log order
         $this->buildLogOrder($attributes, $username, $now);
         
         // Note admin
-        if ($this->isNewRecord) {
-            if (in_array('note_admin', $attributes) AND in_array('note_admin_content', $attributes) AND !empty($this->note_admin_content)){
+        if (in_array('note_admin', $attributes) AND in_array('note_admin_content', $attributes) AND !empty($this->note_admin_content)){
+            if ($this->isNewRecord) {
                 $this->note_admin = [
                     [
                         'content' => $this->note_admin_content,
@@ -61,10 +61,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                         'created_at' => $now,
                     ]
                 ];
-                $this->note_admin_content = '';
-            }
-        } else {
-            if (in_array('note_admin', $attributes) AND in_array('note_admin_content', $attributes) AND !empty($this->note_admin_content)){
+            } else {
                 $this->note_admin = ArrayHelper::merge($this->note_admin, [
                     [
                         'content' => $this->note_admin_content,
@@ -73,8 +70,8 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                         'created_at' => $now,
                     ]
                 ]);
-                $this->note_admin_content = '';
             }
+            $this->note_admin_content = '';
         }
         
         return parent::beforeSave($insert);
@@ -96,8 +93,12 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             '_id',
             'creator',
             'updater',
-            'log'
+            'log',
+            'note_admin_content',
+            'note_admin',
         ];
+        
+        $action = 'add';
         
         // Just check the update
         if (!$this->isNewRecord){
@@ -107,23 +108,27 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             
             // Attribute after change
             $attributeNews = array_diff_key($this->getAttributes(), array_flip($attributeRemove));
-            
+
             foreach ($attributeNews as $attribute => $attributeValue) {
-                if (isset($oldAttributes[$attribute]) AND ($oldAttributes[$attribute] !== $attributeValue)){
-                    if (!is_array($oldAttributes[$attribute]))
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . ' from ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldAttributes[$attribute]))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $attributeValue))));
-                    else{
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . '' . Html::tag('ul', implode('', $this->getValueAtributeArray($oldAttributes[$attribute], $attributeValue))));
+                // Value of item before change
+                $oldAttribute = ArrayHelper::getValue($oldAttributes, $attribute);
+
+                if (!empty($attributeValue) AND ($oldAttribute !== $attributeValue)){
+                    if (!is_array($attributeValue)) {
+                        if (!empty($oldAttribute))
+                            $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . ' from ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $oldAttribute))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
+                        else
+                            $changeValue[] = Html::tag('li', 'Add new ' . $this->getAttributeLabel($attribute) . ': ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
+                    } else {
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . '' . Html::tag('ul', implode('', $this->getValueAtributeArray($oldAttribute, $attributeValue))));
                     }
                 }
             }
             $action = 'update';
-        } else {
-            $action = 'add';
         }
-        
+
         // IF exits log in attribute
-        if (in_array('log', $attributes)){
+        if (($action == 'add' OR !empty($changeValue)) AND in_array('log', $attributes)){
             // IF exits log or log empty
             if (empty($this->log)) {
                 $this->log = [
@@ -136,27 +141,24 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     ]
                 ];
             } else if (in_array('note_admin_content', $attributes) AND empty($this->note_admin_content)){
+                // Note log
+                $note = ucfirst($action) . ' order: ' . $this->ecommerce_id . ' width change follow: ' . Html::tag('ul', implode('', $changeValue));
+
+                // If status is null then action set delete
                 if ($this->status === \sya\ecommerce\Module::STATUS_EMPTY){
-                    $this->log = ArrayHelper::merge([
-                        [
-                            'creator' => Yii::$app->user->id,
-                            'creator_name' => Yii::$app->user->identity->$username,
-                            'created_at' => $now,
-                            'action' => 'delete',
-                            'note' => 'Delete order: ' . $this->ecommerce_id
-                        ]
-                    ], $this->log);
-                } else {
-                    $this->log = ArrayHelper::merge([
-                        [
-                            'creator' => Yii::$app->user->id,
-                            'creator_name' => Yii::$app->user->identity->$username,
-                            'created_at' => $now,
-                            'action' => $action,
-                            'note' => ucfirst($action) . ' order: ' . $this->ecommerce_id . ' width change follow: ' . Html::tag('ul', implode('', $changeValue))
-                        ]
-                    ], $this->log);
+                    $action = 'delete';
+                    $note = 'Delete order: ' . $this->ecommerce_id;
                 }
+
+                $this->log = ArrayHelper::merge([
+                    [
+                        'creator' => Yii::$app->user->id,
+                        'creator_name' => Yii::$app->user->identity->$username,
+                        'created_at' => $now,
+                        'action' => $action,
+                        'note' => $note
+                    ]
+                ], $this->log);
             }
         }
     }
@@ -169,23 +171,24 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
      * @param string $name key attribute change
      * @return array
      */
-    protected function getValueAtributeArray($attribute, $attributeNew, $changeValue = [], $name = ''){
+    protected function getValueAtributeArray($attribute = [], $attributeNew, $changeValue = [], $name = ''){
+        // Set default value $action, $attributeLong, $attributeSmall
+        $action = 'Delete';
+        $attributeLong = $attribute;
+        $attributeSmall = $attributeNew;
+
         // Check if length $attribute > $attributeNew then key not exits is delete. If length $attributeNew > $attribute then key not exits is add
-        if (count($attribute) > count($attributeNew)){
+        if (count($attribute) < count($attributeNew)){
             // Action when have key not exits in $attributeLong
-            $action = 'Delete';
+            $action = 'Add';
             
             // Attribute have long length
-            $attributeLong = $attribute;
+            $attributeLong = $attributeNew;
             
             // Attribute have small length
-            $attributeSmall = $attributeNew;
-        } else {
-            $action = 'Add';
-            $attributeLong = $attributeNew;
             $attributeSmall = $attribute;
         }
-        
+
         foreach ($attributeLong as $key => $items) {
             if (is_array($items)){
                 if (isset($attributeSmall[$key]))
@@ -193,18 +196,26 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 else
                     $changeValue[] = Html::tag('li', $action . ' id: ' . $key . '');
             } else {
-                foreach ($attributeLong as $keyItem => $item) {
-                    $itemNewValue = ArrayHelper::getValue($attributeSmall, $keyItem, $this->getAttributeLabel($keyItem));
-                        
-                    if ($item !== $itemNewValue){
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($keyItem) . ' of ' . $name . ' from ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $item))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $itemNewValue))));
-                        break;
-                    }
+                $itemSmallValue = ArrayHelper::getValue($attributeSmall, $key, $this->getAttributeLabel($key));
+
+                // Set default $oldItemValue and $newItemValue
+                $oldItemValue = $items;
+                $newItemValue = $itemSmallValue;
+
+                // Set old item value and new item value when $action = Delete
+                if ($action == 'Add'){
+                    $oldItemValue = $itemSmallValue;
+                    $newItemValue = $items;
                 }
-                break;
+
+                if ($items !== $itemSmallValue){
+                    if (!empty($oldItemValue))
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($key) . ' of ' . $name . ' from ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                    else
+                        $changeValue[] = Html::tag('li', 'Add new ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                }
             }
         }
-        
         return $changeValue;
     }
 

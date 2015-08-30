@@ -17,6 +17,32 @@ use sya\gallery\Module;
     'ecommerce' => [
         'class' => 'sya\ecommerce\Module',
         'itemModule' => 'sya\ecommerce\models\Order',
+        'customerTable' => [
+            'customerModule' => 'app\modules\account\models\User',
+            'customerColumns' => [
+                [
+                    'attribute' => 'p_fullname',
+                    'hAlign'=>'center',
+                    'vAlign'=>'middle',
+                    'contentOptions' => [
+                        'class' => 'customer_p_fullname'
+                    ],
+                ],
+                [
+                    'attribute' => 'p_address',
+                    'hAlign'=>'center',
+                    'vAlign'=>'middle',
+                    'contentOptions' => [
+                        'class' => 'customer_p_address'
+                    ],
+                ],
+            ],
+            'customerSearch' => 'searchCustomer',
+            'fieldOrder' => [
+                'full_name' => 'p_fullname',
+                'address' => 'p_address',
+            ]
+        ],
         'productTable' => [
             'productModule' => 'app\modules\product\models\Product',
             'productColumns' => [
@@ -38,17 +64,17 @@ use sya\gallery\Module;
                 ],
                 [
                     'class'=>'kartik\grid\BooleanColumn',
-                    'attribute'=>'status', 
+                    'attribute'=>'status',
                     'vAlign'=>'middle',
                     'format'=>'raw',
                     'trueLabel' => 'Hiện',
                     'falseLabel' => 'Ẩn'
                 ]
             ],
-            'fileOrder' => [
-                'title',
-                'sku',
-                'price',
+            'fieldOrder' => [
+                'title' => 'title',
+                'sku' => 'sku',
+                'price' => 'price',
             ]
         ]
     ],
