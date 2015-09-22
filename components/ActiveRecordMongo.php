@@ -96,6 +96,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             'log',
             'note_admin_content',
             'note_admin',
+            'product_text',
         ];
         
         $action = 'add';

@@ -53,17 +53,26 @@ class AjaxController extends \yii\web\Controller{
                     '$in' => $ids
                 ]
             ])->all();
-            
+
+            // List title
+            $titles = [];
+
+            // Get infomation product generate tempalte product
             foreach ($model as $product) {
                 $productInfomation = [];
                 foreach ($productFieldOrder as $key => $item) {
                     $productInfomation[$key] = $product->$item;
+                    if ($key == 'title')
+                        $titles[] = $product->$item;
                 }
                 $list_product[$product->_id] = ArrayHelper::merge($list_product[$product->_id], $productInfomation);
             }
             
             $modelOrder = new $ecommerce->itemModule;
-            echo $modelOrder->generateProductOrder($list_product, $shipping);
+            echo json_encode([
+                'template' => $modelOrder->generateProductOrder($list_product, $shipping),
+                'titles' => implode(',', $titles)
+            ]);
         }
     }
     

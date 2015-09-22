@@ -59,6 +59,7 @@ echo GridView::widget([
 
 Modal::end();
 echo Html::hiddenInput('product_list', \sya\ecommerce\Module::getProductList($model->product), ['id' => 'product_list']);
+echo Html::hiddenInput(\yii\helpers\StringHelper::basename(get_class($model)) . '[product_text]', $model->product_text, ['id' => 'product_text']);
 
 // Register js code
 $this->registerJs("
@@ -167,9 +168,11 @@ $this->registerJs("
         $.ajax({
             url: '" . \yii\helpers\Url::to(['/ecommerce/ajax/addproduct']) . "',
             type: 'post',
+            dataType: 'json',
             data: {data: $('#product_list').val(), shipping: shipping},
         }).done(function (data) {
-            $('#product_info').html(data);
+            $('#product_info').html(data.template);
+            $('#product_text').val(data.titles);
             totalProduct();
             $('#product_modal').modal('hide');
         });

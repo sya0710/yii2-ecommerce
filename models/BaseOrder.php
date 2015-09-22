@@ -15,6 +15,7 @@ use Yii;
  * @property mixed $updated_at
  * @property mixed $status
  * @property mixed $product
+ * @property mixed $product_text
  * @property mixed $shipping
  * @property mixed $customer
  * @property mixed $payment
@@ -47,6 +48,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'updated_at',
             'status',
             'product',
+            'product_text',
             'shipping',
             'customer',
             'payment',
@@ -63,7 +65,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
     public function rules()
     {
         return [
-            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'], 'safe']
+            [['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'], 'safe']
         ];
     }
 
@@ -81,6 +83,7 @@ class BaseOrder extends \sya\ecommerce\components\ActiveRecordMongo
             'updated_at' => Yii::t('ecommerce', 'Updated At'),
             'status' => Yii::t('ecommerce', 'Status'),
             'product' => Yii::t('ecommerce', 'Product'),
+            'product_text' => Yii::t('ecommerce', 'Product Text'),
             'customer' => Yii::t('ecommerce', 'Customer'),
             'payment' => Yii::t('ecommerce', 'Payment'),
             'note_customer' => Yii::t('ecommerce', 'Note Customer'),

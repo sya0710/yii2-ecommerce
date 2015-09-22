@@ -365,6 +365,9 @@ HTML;
         
         // Controller action in ecommerce
         $actions = ArrayHelper::getValue($this->itemSettings, 'actions', []);
+
+        // Get Module in ecommerce
+        $ecommerce = $this->module();
         
         // Build default columns
         $columns = ArrayHelper::getValue($this->itemSettings, 'columns', [
@@ -392,9 +395,26 @@ HTML;
                 'format'=>'raw',
             ],
             [
-                'attribute' => 'creator',
-                'hAlign'=>'center',
+                'attribute' => 'customer',
                 'vAlign'=>'middle',
+                'value'=>function ($model, $key, $index, $widget) {
+                    $customer = [];
+                    foreach ($model->customer as $filedCustomerOrder => $fieldCustomerTable) {
+                        $customer[] = '-' . ArrayHelper::getValue($model->customer, $filedCustomerOrder);
+                    }
+
+                    return implode("<br>", $customer);
+                },
+                'format'=>'raw',
+            ],
+            [
+                'attribute' => 'product_text',
+                'vAlign'=>'middle',
+                'value'=>function ($model, $key, $index, $widget) {
+                    $product = '-'.implode("<br>-", explode(',', $model->product_text));
+                    return $product;
+                },
+                'format'=>'raw',
             ],
             [
                 'attribute'=>'created_at',

@@ -26,6 +26,7 @@ use sya\ecommerce\helpers\SyaHelper;
  * - price: price of product when ordering at that time. (No change when price of product change).
  * - quantity: quantity order of product.
  * - is_marketing: promotional products or not at the time. (No change)
+ * @property mixed $product_text
  * @property mixed $shipping
  * @property mixed $customer infomation of customer when shopping
  * @property mixed $payment
@@ -53,9 +54,9 @@ class Order extends BaseOrder
     public function scenarios()
     {
         return array_merge(Model::scenarios(), [
-            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
-            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
-            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
         ]);
     }
     
@@ -71,7 +72,7 @@ class Order extends BaseOrder
         $query->where([
             'status' => [
                 '$ne' => ''
-            ]
+            ],
         ]);
 
         $dataProvider = new \yii\data\ActiveDataProvider([
@@ -84,10 +85,18 @@ class Order extends BaseOrder
         if (!($this->load($params) AND $this->validate())) {
             return $dataProvider;
         }
+
+        // Get Module in ecommerce
+        $ecommerce = Ecommerce::module();
+
+        // Customer field
+        $customerField = ArrayHelper::getValue($ecommerce->customerTable, 'fieldOrder');
         
         $query = SyaHelper::addMongoFilter($query, 'ecommerce_id', $this->ecommerce_id);
         $query = SyaHelper::addMongoFilter($query, 'status', $this->status);
-        
+        $query = SyaHelper::addMongoFilter($query, 'customer', $this->customer, 'or', $customerField);
+        $query = SyaHelper::addMongoFilter($query, 'product_text', $this->product_text, 'like', $customerField);
+
         if (!empty($this->created_at)){
             list($minDate, $maxDate) = explode(' to ', $this->created_at);
             $min_date = new \MongoDate(strtotime($minDate . ' 00:00:00'));
@@ -230,7 +239,11 @@ class Order extends BaseOrder
         
         return null;
     }
-    
+
+    /**
+     * Function generate customer infomation
+     * @return string
+     */
     public function generateCustomerOrder(){
         $ecommerce = Ecommerce::module();
         
