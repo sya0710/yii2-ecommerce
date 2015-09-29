@@ -9,7 +9,7 @@ use yii\helpers\Url;
 use sya\ecommerce\Module;
 
 class Ecommerce extends \yii\base\Widget {
-    
+
     /**
      * @var string The template for rendering the ecommerce within a panel.
      * The following special variables are recognized and will be replaced:
@@ -19,33 +19,33 @@ class Ecommerce extends \yii\base\Widget {
      * - {items}: string, render item order.
      */
     public $layout = "{statistic}\n{items}";
-    
+
     /**
      * @var string The template for rendering the item statistic ecommerce within a statistic.
      */
     public $itemStatistic = "{statisticContent}";
-    
+
     /**
      * @var array The multi column of statistic
      * $statisticColumns = [
      *      [
-    *           'header' => '',
-    *           'smallHeader' => '',
-    *           'time' => '',
-    *           'percent' => '',
-    *           'totalStatistic' => ''
+     *           'header' => '',
+     *           'smallHeader' => '',
+     *           'time' => '',
+     *           'percent' => '',
+     *           'totalStatistic' => ''
      *      ],
      *      [
-    *           'header' => '',
-    *           'smallHeader' => '',
-    *           'time' => '',
-    *           'percent' => '',
-    *           'totalStatistic' => ''
+     *           'header' => '',
+     *           'smallHeader' => '',
+     *           'time' => '',
+     *           'percent' => '',
+     *           'totalStatistic' => ''
      *      ],
      * ]
      */
     public $statisticColumns = [];
-    
+
     /**
      * @var string The template for rendering the statistic ecommerce within a statistic.
      * - {header}: title box statistic.
@@ -64,25 +64,25 @@ class Ecommerce extends \yii\base\Widget {
             </div>
         </div>
 HTML;
-    
+
     /**
      * @var boolean The ecommerce run realtime when cart order
      * Defaults to `false`. If set to `true`, ecommerce use nodejs run realtime with cart order, statistical order and chart order
      * If set to `false` ecommerce will be disabled and none of the realtime will be applied.
      */
     public $realtime = false;
-    
+
     /**
      * @var boolean The gridview run pjax
      * Defaults to `false`.
      */
     public $pjax = false;
-    
+
     /**
      * @var array the HTML attributes for the items element
      */
     public $itemOptions = [];
-    
+
     /**
      * @var array setting item
      * $itemSettings = [
@@ -99,22 +99,22 @@ HTML;
      * ];
      */
     public $itemSettings = [];
-    
+
     /**
      * @var array the HTML attributes for the statistic element
      */
     public $statisticOptions = ['class' => 'row'];
-    
+
     /**
      * @var array the HTML attributes for the search element
      */
     public $searchOptions = [];
-    
+
     /**
      * @var array the HTML attribtes for the charts element
      */
     public $chartsOptions = [];
-    
+
     /**
      * Gets the module
      *
@@ -127,7 +127,7 @@ HTML;
         $mod = Yii::$app->controller->module;
         return $mod && $mod->getModule($m) ? $mod->getModule($m) : Yii::$app->getModule($m);
     }
-    
+
     /**
      * Returns the ecommerce module
      *
@@ -173,7 +173,7 @@ HTML;
         $config = self::getConfig($config);
         return parent::widget($config);
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -187,19 +187,19 @@ HTML;
      */
     public function run() {
         parent::run();
-        
+
         $this->registerAssets();
         $this->initLayout();
-        
+
         $content = preg_replace_callback("/{\\w+}/", function ($matches) {
             $content = $this->renderSection($matches[0]);
 
             return $content === false ? $matches[0] : $content;
         }, $this->layout);
-        
+
         return $content;
     }
-    
+
     /**
      * Build layout ecommerce template
      * @return string
@@ -207,25 +207,25 @@ HTML;
     protected function initLayout(){
         // Array init element panel template
         $replace = [];
-        
+
         // If panel template have statistical then call function render statistical
         if (strpos($this->layout, '{statistic}') !== false) {
             $statisticTemplate = $this->renderStatistic();
             $replace['{statistic}'] = $statisticTemplate;
         }
-        
+
         // If panel template have charts then call function render charts.
         if (strpos($this->layout, '{charts}') !== false) {
             $chartsTemplate = $this->renderCharts();
             $replace['{charts}'] = $chartsTemplate;
         }
-        
+
         // If panel template have search then call function render search.
         if (strpos($this->layout, '{search}') !== false) {
             $searchTemplate = $this->renderSearch();
             $replace['{search}'] = $searchTemplate;
         }
-        
+
         // If panel template have items then call function render items.
         if (strpos($this->layout, '{items}') !== false) {
             $items = $this->renderItems();
@@ -234,7 +234,7 @@ HTML;
 
         $this->layout = strtr($this->layout, $replace);
     }
-    
+
     /**
      * Renders a section of the specified name.
      * If the named section is not supported, false will be returned.
@@ -252,17 +252,17 @@ HTML;
                 return false;
         }
     }
-    
+
     /**
      * Render statistic template
      * @return string
      */
     public function renderStatistic(){
         $content = Html::tag('div', $this->itemStatistic, $this->statisticOptions);
-        
+
         return $content;
     }
-    
+
     /**
      * Return statistic content
      * @return string
@@ -294,7 +294,7 @@ HTML;
                 if ($time !== false){
                     if (empty($timeOptions['class']))
                         $timeOptions['class'] = 'label-success';
-                    
+
                     Html::addCssClass($timeOptions, 'label pull-right');
                     $time = Html::tag('span', $time, $timeOptions);
                 }
@@ -313,7 +313,7 @@ HTML;
                     Html::addCssClass($smallHeaderOptions, '');
                     $smallHeader = Html::tag('small', $smallHeader, $smallHeaderOptions);
                 }
-                
+
                 $statistic = strtr(
                     $this->statisticTemplate,
                     [
@@ -324,14 +324,14 @@ HTML;
                         '{smallHeader}' => $smallHeader,
                     ]
                 );
-                
+
                 $content .= Html::tag('div', $statistic, ['class' => 'col-lg-' . (round(12/$numberColumn))]);
             }
         }
-        
+
         return $content;
     }
-    
+
     /**
      * Render chart report
      * @return string
@@ -339,7 +339,7 @@ HTML;
     public function renderCharts(){
         return "chart";
     }
-    
+
     /**
      * Render form search order
      * @return string
@@ -347,7 +347,7 @@ HTML;
     public function renderSearch(){
         return "search";
     }
-    
+
     /**
      * Render item order
      * @return string
@@ -358,17 +358,17 @@ HTML;
         $panel = ArrayHelper::getValue($this->itemSettings, 'panel', [
             'heading' => Yii::t('ecommerce', 'Order'),
         ]);
-        
+
         // If empty($dataProvider), empty($searchModel) then set default $dataProvider, $searchModel.
         $dataProvider = ArrayHelper::getValue($this->itemSettings, 'dataProvider', '');
         $searchModel = ArrayHelper::getValue($this->itemSettings, 'searchModel', '');
-        
+
         // Controller action in ecommerce
         $actions = ArrayHelper::getValue($this->itemSettings, 'actions', []);
 
         // Get Module in ecommerce
         $ecommerce = $this->module();
-        
+
         // Build default columns
         $columns = ArrayHelper::getValue($this->itemSettings, 'columns', [
             [
@@ -387,9 +387,9 @@ HTML;
                 'attribute' => 'ecommerce_id',
                 'hAlign'=>'center',
                 'vAlign'=>'middle',
-                'value'=>function ($model, $key, $index, $widget) { 
-                    return Html::a($model->ecommerce_id,  
-                        Url::to(['update','id'=>$model->_id]), 
+                'value'=>function ($model, $key, $index, $widget) {
+                    return Html::a($model->ecommerce_id,
+                        Url::to(['update','id'=>$model->_id]),
                         ['title'=>'Xem chi tiết '.$model->ecommerce_id.'']);
                 },
                 'format'=>'raw',
@@ -433,7 +433,7 @@ HTML;
                     'hideInput'=>true,
                     'convertFormat'=>true,
                 ],
-                'value'=>function ($model, $key, $index, $widget) { 
+                'value'=>function ($model, $key, $index, $widget) {
                     return date('d-m-Y', $model->created_at->sec);
                 },
             ],
@@ -443,9 +443,9 @@ HTML;
                 'vAlign'=>'middle',
                 'width'=>'150px',
                 'filterType'=>$namespaceGridview::FILTER_SELECT2,
-                'filter'=> Module::$status, 
+                'filter'=> Module::$status,
                 'filterWidgetOptions'=>[
-                    'pluginOptions'=>['allowClear'=>true],
+                    'pluginOptions'=>['allowClear'=>true, 'width' => '150px'],
                 ],
                 'filterInputOptions'=>['placeholder'=>Yii::t('ecommerce', 'Status')],
                 'editableOptions'=> function ($model, $key, $index){
@@ -489,7 +489,7 @@ HTML;
                     ];
                 },
                 'format'=>'raw',
-                'value'=>function ($model, $key, $index, $widget) { 
+                'value'=>function ($model, $key, $index, $widget) {
                     return Html::tag('span', ArrayHelper::getValue(Module::$status, $model->status), ['class' => 'syaStatus']);
                 },
             ],
@@ -500,12 +500,12 @@ HTML;
                 'template' => '{delete}',
             ]
         ]);
-        
+
         $button = Html::a(Yii::t('ecommerce', 'Create'). ' ' .Yii::t('ecommerce', 'Order'), $actions[Module::ACTION_CREATE] , [
             'class' => 'btn btn-info',
             'style' => 'margin-bottom: 10px;',
         ]);
-        
+
         return $button . $namespaceGridview::widget([
             'panel' => $panel,
             'pjax' => $this->pjax,
@@ -516,7 +516,7 @@ HTML;
             'hover' => true,
         ]);
     }
-    
+
     private function registerAssets(){
     }
 }
