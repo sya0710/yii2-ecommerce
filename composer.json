@@ -16,7 +16,8 @@
         "yiisoft/yii2-bootstrap": "*",
 		"yiisoft/yii2-mongodb": "dev-master",
 		"kartik-v/yii2-dynagrid": "*",
-        "bower-asset/sweetalert": "*"
+        "bower-asset/sweetalert": "*",
+        "sya/yii2-payment": "dev-master"
     },
     "autoload": {
         "psr-4": {

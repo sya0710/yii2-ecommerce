@@ -1,9 +1,7 @@
 <?php
 use yii\helpers\Url;
 use yii\bootstrap\ActiveForm;
-use yii\helpers\ArrayHelper;
-use yii\bootstrap\Html;
-use sya\ecommerce\Module;
+use sya\payment\Payment;
 sya\ecommerce\EcommerceAssets::register($this);
 
 $form = ActiveForm::begin([
@@ -90,12 +88,7 @@ $form = ActiveForm::begin([
                 <h5><?= Yii::t('ecommerce', 'Payment') ?></h5>
             </div>
             <div class="ibox-content">
-                <select class="form-control">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                </select>
+                <?= $form->field($model, 'payment')->widget(Payment::className(), []); ?>
             </div>
         </div>
     </div>
