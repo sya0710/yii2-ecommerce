@@ -149,5 +149,16 @@ echo Ecommerce::widget([
 ]);
 ```
 
+## I18n
+```
+'components' => [
+	'i18n' => [
+		'translations' => [
+			'ecommerce' => ['class' => 'yii\i18n\PhpMessageSource', 'basePath' => '@syaEcommerce/messages'],
+		],
+	],
+],
+```
+
 ## License
 **yii2-ecommerce** is released under the MIT License. See the bundled LICENSE.md for details.

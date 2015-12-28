@@ -41,7 +41,7 @@ class Module extends \yii\base\Module{
      * Log status action order
      */
     public static $logStatus = [
-        'add' => 'fa-plus',
+        'create' => 'fa-plus',
         'update' => 'fa-edit',
         'delete' => 'fa-remove'
     ];
@@ -83,6 +83,9 @@ class Module extends \yii\base\Module{
     public function init()
     {
         parent::init();
+
+        Yii::setAlias('syaEcommerce', '@vendor/sya/yii2-ecommerce');
+
         // Setup params itemSettings
         $item = ArrayHelper::getValue($this->itemSettings, 'itemSettings', []);
         $actions = ArrayHelper::getValue($item, 'actions', []);

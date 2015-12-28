@@ -19,13 +19,13 @@ $customerColumns = ArrayHelper::merge($defaultColumns, $customerColumns);
     
 Modal::begin([
     'id' => 'customer_modal',
-    'header' => '<h4 class="modal-title" id="myModalLabel">' . Yii::t('ecommerce', 'List Customer') . '</h4>',
+    'header' => '<h4 class="modal-title" id="myModalLabel">' . Yii::t('ecommerce', 'List') . ' ' . Yii::t('ecommerce', 'Customer') . '</h4>',
     'size' => 'modal-lg',
     'toggleButton' => [
-        'label' => '<i class="fa fa-plus"></i>&nbsp;' . Yii::t('ecommerce', 'Add') . ' ' . Yii::t('ecommerce', 'Customer'),
+        'label' => '<i class="fa fa-plus"></i>&nbsp;' . Yii::t('ecommerce', 'Create') . ' ' . Yii::t('ecommerce', 'Customer'),
         'class' => 'btn btn-xs btn-primary pull-right'
     ],
-    'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Save changes</button>'
+    'footer' => '<button type="button" class="btn btn-primary">' . Yii::t('ecommerce', 'Create') . ' ' . Yii::t('ecommerce', 'Customer') . '</button>'
 ]);
 
 echo GridView::widget([

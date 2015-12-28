@@ -99,7 +99,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             'product_text',
         ];
         
-        $action = 'add';
+        $action = 'create';
         
         // Just check the update
         if (!$this->isNewRecord){
@@ -117,11 +117,11 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 if (!empty($attributeValue) AND ($oldAttribute !== $attributeValue)){
                     if (!is_array($attributeValue)) {
                         if (!empty($oldAttribute))
-                            $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . ' from ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $oldAttribute))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
+                            $changeValue[] = Html::tag('li', '{attribute_' . $attribute . '} {from} ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $oldAttribute))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
                         else
-                            $changeValue[] = Html::tag('li', 'Add new ' . $this->getAttributeLabel($attribute) . ': ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
+                            $changeValue[] = Html::tag('li', '{action} {attribute_' . $attribute . '}: ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
                     } else {
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($attribute) . '' . Html::tag('ul', implode('', $this->getValueAtributeArray($oldAttribute, $attributeValue))));
+                        $changeValue[] = Html::tag('li', '{attribute_' . $attribute . '}' . Html::tag('ul', implode('', $this->getValueAtributeArray($oldAttribute, $attributeValue))));
                     }
                 }
             }
@@ -129,7 +129,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         }
 
         // IF exits log in attribute
-        if (($action == 'add' OR !empty($changeValue)) AND in_array('log', $attributes)){
+        if (($action == 'create' OR !empty($changeValue)) AND in_array('log', $attributes)){
             // IF exits log or log empty
             if (empty($this->log)) {
                 $this->log = [
@@ -138,17 +138,17 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                         'creator_name' => Yii::$app->user->identity->$username,
                         'created_at' => $now,
                         'action' => $action,
-                        'note' => ucfirst($action) . ' new order: ' . $this->ecommerce_id
+                        'note' => $this->ecommerce_id
                     ]
                 ];
             } else if (in_array('note_admin_content', $attributes) AND empty($this->note_admin_content)){
                 // Note log
-                $note = ucfirst($action) . ' order: ' . $this->ecommerce_id . ' width change follow: ' . Html::tag('ul', implode('', $changeValue));
+                $note = $this->ecommerce_id . ' {follow}' . Html::tag('ul', implode('', $changeValue));
 
                 // If status is null then action set delete
                 if ($this->status === \sya\ecommerce\Module::STATUS_EMPTY){
                     $action = 'delete';
-                    $note = 'Delete order: ' . $this->ecommerce_id;
+                    $note = $this->ecommerce_id;
                 }
 
                 $this->log = ArrayHelper::merge([
@@ -181,7 +181,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         // Check if length $attribute > $attributeNew then key not exits is delete. If length $attributeNew > $attribute then key not exits is add
         if (count($attribute) < count($attributeNew)){
             // Action when have key not exits in $attributeLong
-            $action = 'Add';
+            $action = 'Create';
             
             // Attribute have long length
             $attributeLong = $attributeNew;
@@ -195,7 +195,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 if (isset($attributeSmall[$key]))
                     $changeValue = $this->getValueAtributeArray($items, $attributeSmall[$key], $changeValue, $key);
                 else
-                    $changeValue[] = Html::tag('li', $action . ' id: ' . $key . '');
+                    $changeValue[] = Html::tag('li', '{' . $action . '} id: ' . $key . '');
             } else {
                 $itemSmallValue = ArrayHelper::getValue($attributeSmall, $key, $this->getAttributeLabel($key));
 
@@ -204,16 +204,16 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 $newItemValue = $itemSmallValue;
 
                 // Set old item value and new item value when $action = Delete
-                if ($action == 'Add'){
+                if ($action == 'Create'){
                     $oldItemValue = $itemSmallValue;
                     $newItemValue = $items;
                 }
 
                 if ($items !== $itemSmallValue){
                     if (!empty($oldItemValue))
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($key) . ' of ' . $name . ' from ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' to ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($key) . ' {of} ' . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                     else
-                        $changeValue[] = Html::tag('li', 'Add new ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{action} ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                 }
             }
         }

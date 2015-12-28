@@ -25,7 +25,7 @@ $form = ActiveForm::begin([
         <div id="nestable-menu">
             <div class="btn-group">
                 <?php if (!$model->getIsNewRecord()): ?>
-                    <button class="btn btn-primary " type="submit"><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Update') ?> <?= Yii::t('ecommerce', 'Order') ?></button>
+                    <button class="btn btn-primary " type="submit"><i class="fa fa-check"></i>&nbsp;<?= Yii::t('yii', 'Update') ?> <?= Yii::t('ecommerce', 'Order') ?></button>
                     <a href="<?= Url::to(['create']) ?>" class="btn btn-info "><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Create') ?> <?= Yii::t('ecommerce', 'Order') ?></a>
                 <?php else: ?>
                     <button class="btn btn-info " type="submit"><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Create') ?> <?= Yii::t('ecommerce', 'Order') ?></button>
@@ -88,7 +88,7 @@ $form = ActiveForm::begin([
                 <h5><?= Yii::t('ecommerce', 'Payment') ?></h5>
             </div>
             <div class="ibox-content">
-                <?= $form->field($model, 'payment')->widget(Payment::className(), []); ?>
+                <?= $form->field($model, 'payment', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->label(false)->widget(Payment::className(), []); ?>
             </div>
         </div>
     </div>
@@ -131,7 +131,7 @@ $form = ActiveForm::begin([
     <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5><?= Yii::t('ecommerce', 'Note Admin') ?></h5>
+                <h5><?= Yii::t('ecommerce', 'Note admin') ?></h5>
             </div>
             <div class="ibox-content">
                 <?= $this->render('_note_admin', [
@@ -150,7 +150,7 @@ $form = ActiveForm::begin([
     <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5><?= Yii::t('ecommerce', 'Log order') ?></h5>
+                <h5><?= Yii::t('ecommerce', 'Log order change') ?></h5>
             </div>
             <div class="ibox-content inspinia-timeline" id='syaTimeline'>
                <?= $model->generateLogOrder(); ?>
@@ -166,8 +166,8 @@ $form = ActiveForm::begin([
         <div id="nestable-menu">
             <div class="btn-group">
                 <?php if (!$model->getIsNewRecord()): ?>
-                    <button class="btn btn-primary " type="submit"><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Update') ?> <?= Yii::t('ecommerce', 'Order') ?></button>
-                    <a href="<?= Url::to(['create']) ?>" class="btn btn-info "><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Create') ?> <?= Yii::t('ecommerce', 'Order') ?></a>
+                    <button class="btn btn-primary " type="submit"><i class="fa fa-check"></i>&nbsp;<?= Yii::t('yii', 'Update') ?> <?= Yii::t('ecommerce', 'Order') ?></button>
+                        <a href="<?= Url::to(['create']) ?>" class="btn btn-info "><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Create') ?> <?= Yii::t('ecommerce', 'Order') ?></a>
                 <?php else: ?>
                     <button class="btn btn-info " type="submit"><i class="fa fa-check"></i>&nbsp;<?= Yii::t('ecommerce', 'Create') ?> <?= Yii::t('ecommerce', 'Order') ?></button>
                 <?php endif; ?>

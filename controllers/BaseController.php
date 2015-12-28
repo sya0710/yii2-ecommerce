@@ -48,7 +48,7 @@ class BaseController extends \yii\web\Controller{
         // Get customer field
         $customerField = ArrayHelper::getValue($ecommerce->customerTable, 'fieldOrder');
 
-        return $this->render('@vendor/sya/yii2-ecommerce/views/base/form', [
+        return $this->render('@syaEcommerce/views/base/form', [
             'model' => $model,
             'productSearchModel' => ArrayHelper::getValue($productData, 'searchModel'),
             'productDataProvider' => ArrayHelper::getValue($productData, 'dataProvider'),
@@ -74,7 +74,7 @@ class BaseController extends \yii\web\Controller{
             $this->redirect(['update', 'id' => $model->_id]);
         }
         
-        Yii::$app->view->title = Yii::t($this->module->id, 'Create') . ' ' . Yii::t($this->module->id, 'Order');
+        Yii::$app->view->title = Yii::t('yii', 'Create') . ' ' . Yii::t($this->module->id, 'Order');
         Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::t($this->module->id, 'Order'), 'url' => ['index']];
         Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::$app->view->title];
 
@@ -93,7 +93,7 @@ class BaseController extends \yii\web\Controller{
             $this->redirect(['update', 'id' => $model->_id]);
         }
         
-        Yii::$app->view->title = Yii::t($this->module->id, 'Update') . ' ' . Yii::t($this->module->id, 'Order') . ': ' . $model->ecommerce_id;
+        Yii::$app->view->title = Yii::t('yii', 'Update') . ' ' . Yii::t($this->module->id, 'Order') . ': ' . $model->ecommerce_id;
         Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::t($this->module->id, 'Order'), 'url' => ['index']];
         Yii::$app->view->params['breadcrumbs'][] = ['label' => Yii::$app->view->title];
         

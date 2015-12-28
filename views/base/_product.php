@@ -36,15 +36,15 @@ Modal::begin([
     'size' => 'modal-lg',
     'header' => '<h4 class="modal-title" id="myModalLabel">' . Yii::t('ecommerce', 'List Product') . '</h4>',
     'toggleButton' => [
-        'label' => '<i class="fa fa-plus"></i>&nbsp;' . Yii::t('ecommerce', 'Add') . ' ' . Yii::t('ecommerce', 'Product'),
+        'label' => '<i class="fa fa-plus"></i>&nbsp;' . Yii::t('ecommerce', 'Create') . ' ' . Yii::t('ecommerce', 'Product'),
         'class' => 'btn btn-xs btn-primary pull-right'
     ],
-    'footer' => '<button type="button" onclick="addProduct();" class="btn btn-primary">' . Yii::t('ecommerce', 'Add Product') . '</button>'
+    'footer' => '<button type="button" onclick="addProduct();" class="btn btn-primary">' . Yii::t('ecommerce', 'Create') . ' ' . Yii::t('ecommerce', 'Product') . '</button>'
 ]);
 
 echo GridView::widget([
     'panel' => [
-        'heading' => Yii::t('product', 'Product'),
+        'heading' => Yii::t('ecommerce', 'Product'),
     ],
     'id' => 'product-grid',
     'pjax' => TRUE,

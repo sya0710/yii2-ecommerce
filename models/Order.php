@@ -330,8 +330,8 @@ class Order extends BaseOrder
                                 $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at->sec), ['class' => 'text-navy']);
                         $template .= Html::endTag('div');
                         $template .= Html::beginTag('div', ['class' => 'col-xs-7 content no-top-border']);
-                                $template .= Html::tag('p', Html::tag('strong', ucfirst($action)), ['class' => 'm-b-xs']);
-                                $template .= Html::tag('p', Html::a($logCreator, Url::to([$linkUser, $idUser => $creator])) . ' ' . $note);
+                                $template .= Html::tag('p', Html::tag('strong', Yii::t('ecommerce', ucfirst($action))), ['class' => 'm-b-xs']);
+                                $template .= Html::tag('p', Html::a($logCreator, Url::to([$linkUser, $idUser => $creator])) . ' ' . Yii::t('ecommerce', ucfirst($action)) . ' ' . Yii::t('ecommerce', 'Order') . ' ' . $this->generateNote($note));
                         $template .= Html::endTag('div');
                     $template .= Html::endTag('div');
                 $template .= Html::endTag('div');
@@ -339,5 +339,45 @@ class Order extends BaseOrder
         }
         
         return $template;
+    }
+
+    private function generateNote($note){
+        $patterns = [
+            '/{follow}/',
+            '/{of}/',
+            '/{from}/',
+            '/{to}/',
+            '/{Delete}/',
+            '/{Create}/',
+        ];
+
+        $replace = [
+            Yii::t('ecommerce', 'width change follow') . ': ',
+            Yii::t('ecommerce', 'of'),
+            Yii::t('ecommerce', 'from'),
+            Yii::t('ecommerce', 'to'),
+            Yii::t('yii', 'Delete'),
+            Yii::t('ecommerce', 'Create'),
+        ];
+
+        // Search and replace attribute in ecommerce
+        $attributes = Order::attributes();
+
+        foreach ($attributes as $attribute) {
+            $patterns[] = '/{attribute_' . $attribute . '}/';
+            $replace[] = Order::getAttributeLabel($attribute);
+        }
+
+        // Search and replace language in ecommerce
+        preg_match('/{ecommerce_([A-Z]|[a-z]|[0-9])+}/', $note, $matches);
+
+        foreach ($matches as $match) {
+            if (strstr($match, 'ecommerce_')){
+                $patterns[] = '/' . $match . '/';
+                $replace[] = Yii::t('ecommerce', ucfirst(preg_replace(['/{ecommerce_/', '/}/'], '', $match)));
+            }
+        }
+
+        return preg_replace($patterns, $replace, $note);
     }
 }
