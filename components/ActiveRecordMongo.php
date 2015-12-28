@@ -113,16 +113,18 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             foreach ($attributeNews as $attribute => $attributeValue) {
                 // Value of item before change
                 $oldAttribute = ArrayHelper::getValue($oldAttributes, $attribute);
-
+//                echo $attributeValue . "<br>";
                 if (!empty($attributeValue) AND ($oldAttribute !== $attributeValue)){
                     if (!is_array($attributeValue)) {
                         if (!empty($oldAttribute))
                             $changeValue[] = Html::tag('li', '{attribute_' . $attribute . '} {from} ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $oldAttribute))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
                         else
-                            $changeValue[] = Html::tag('li', '{action} {attribute_' . $attribute . '}: ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
+                            $changeValue[] = Html::tag('li', '{' . $action . '} {attribute_' . $attribute . '}: ' . Yii::t('ecommerce', ucwords(str_replace('_', ' ', $attributeValue))));
                     } else {
                         $changeValue[] = Html::tag('li', '{attribute_' . $attribute . '}' . Html::tag('ul', implode('', $this->getValueAtributeArray($oldAttribute, $attributeValue))));
                     }
+                } else if (empty($attributeValue) AND !empty($oldAttribute)) {
+                    $changeValue[] = Html::tag('li', '{delete} {attribute_' . $attribute . '}');
                 }
             }
             $action = 'update';
@@ -190,6 +192,9 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
             $attributeSmall = $attribute;
         }
 
+        if (!empty($name))
+            $name = ' {of} ' . $name;
+
         foreach ($attributeLong as $key => $items) {
             if (is_array($items)){
                 if (isset($attributeSmall[$key]))
@@ -210,10 +215,14 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 }
 
                 if ($items !== $itemSmallValue){
-                    if (!empty($oldItemValue))
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($key) . ' {of} ' . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                    if (!empty($oldItemValue) AND empty($newItemValue))
+                        $changeValue[] = Html::tag('li', '{delete} ' . $this->getAttributeLabel($key));
+                    else if (!empty($oldItemValue) AND !empty($newItemValue))
+                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($key) . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                    else if (empty($oldItemValue) AND !empty($newItemValue))
+                        $changeValue[] = Html::tag('li', '{create} ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                     else
-                        $changeValue[] = Html::tag('li', '{action} ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{' . $action . '} ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                 }
             }
         }

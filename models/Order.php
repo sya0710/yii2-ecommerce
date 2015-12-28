@@ -347,8 +347,8 @@ class Order extends BaseOrder
             '/{of}/',
             '/{from}/',
             '/{to}/',
-            '/{Delete}/',
-            '/{Create}/',
+            '/{delete}/',
+            '/{create}/',
         ];
 
         $replace = [
@@ -365,19 +365,19 @@ class Order extends BaseOrder
 
         foreach ($attributes as $attribute) {
             $patterns[] = '/{attribute_' . $attribute . '}/';
-            $replace[] = Order::getAttributeLabel($attribute);
+            $replace[] = ucfirst(Order::getAttributeLabel($attribute));
         }
 
         // Search and replace language in ecommerce
-        preg_match('/{ecommerce_([A-Z]|[a-z]|[0-9])+}/', $note, $matches);
+        preg_match('/{ecommerce_([A-Z]|[a-z]|[0-9])+}/', strtolower($note), $matches);
 
         foreach ($matches as $match) {
             if (strstr($match, 'ecommerce_')){
                 $patterns[] = '/' . $match . '/';
-                $replace[] = Yii::t('ecommerce', ucfirst(preg_replace(['/{ecommerce_/', '/}/'], '', $match)));
+                $replace[] = Yii::t('ecommerce', preg_replace(['/{ecommerce_/', '/}/'], '', $match));
             }
         }
 
-        return preg_replace($patterns, $replace, $note);
+        return preg_replace($patterns, $replace, strtolower($note));
     }
 }
