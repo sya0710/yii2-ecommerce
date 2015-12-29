@@ -425,8 +425,10 @@ HTML;
                 'vAlign'=>'middle',
                 'filterWidgetOptions'=>[
                     'pluginOptions'=>[
-                        'format'=>'Y-m-d',
-                        'separator' => ' to ',
+                        'locale' => [
+                            'format'=>'Y-m-d',
+                            'separator' => ' to ',
+                        ],
                         'opens'=>'left'
                     ],
                     'presetDropdown'=>true,
