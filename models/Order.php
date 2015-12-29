@@ -369,13 +369,15 @@ class Order extends BaseOrder
         }
 
         // Search and replace language in ecommerce
-        preg_match_all('/{ecommerce_([A-Z]|[a-z]|[0-9])+}/', $note, $matches);
+        preg_match_all('/{ecommerce_(\w)+}/', $note, $matches);
+
+//        var_dump($matches[0]);die;
 
         if (isset($matches[0])) {
             foreach ($matches[0] as $match) {
                 if (strstr($match, 'ecommerce_')) {
                     $patterns[] = '/' . $match . '/';
-                    $replace[] = Yii::t('ecommerce', preg_replace(['/{ecommerce_/', '/}/'], '', $match));
+                    $replace[] = Yii::t('ecommerce', Order::getAttributeLabel(preg_replace(['/{ecommerce_/', '/}/'], '', $match)));
                 }
             }
         }

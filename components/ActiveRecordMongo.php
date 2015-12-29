@@ -172,11 +172,11 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
      * @param array $attributeNew Array attribute after change
      * @param array $changeValue Array value change
      * @param string $name key attribute change
+     * @param string $action Action when change value
      * @return array
      */
-    protected function getValueAtributeArray($attribute = [], $attributeNew, $changeValue = [], $name = ''){
+    protected function getValueAtributeArray($attribute = [], $attributeNew, $changeValue = [], $name = '', $action = 'delete'){
         // Set default value $action, $attributeLong, $attributeSmall
-        $action = 'delete';
         $attributeLong = $attribute;
         $attributeSmall = $attributeNew;
 
@@ -197,9 +197,17 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
 
         foreach ($attributeLong as $key => $items) {
             if (is_array($items)){
-                if (isset($attributeSmall[$key]))
-                    $changeValue = $this->getValueAtributeArray($items, $attributeSmall[$key], $changeValue, $key);
-                else
+                if (isset($attributeSmall[$key])) {
+                    // Set value new and value old when change infomation of order
+                    $itemOld = $items;
+                    $itemNew = $attributeSmall[$key];
+                    if ('create' === $action){
+                        $itemOld = $attributeSmall[$key];
+                        $itemNew = $items;
+                    }
+
+                    $changeValue = $this->getValueAtributeArray($itemOld, $itemNew, $changeValue, $key);
+                } else
                     $changeValue[] = Html::tag('li', '{' . $action . '} id: ' . $key . '');
             } else {
                 $itemSmallValue = ArrayHelper::getValue($attributeSmall, $key, $this->getAttributeLabel($key));
@@ -216,13 +224,13 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
 
                 if ($items !== $itemSmallValue){
                     if (!empty($oldItemValue) AND empty($newItemValue))
-                        $changeValue[] = Html::tag('li', '{delete} ' . '{ecommerce_' . $this->getAttributeLabel($key) . '}');
+                        $changeValue[] = Html::tag('li', '{delete} ' . '{ecommerce_' . $key . '}');
                     else if (!empty($oldItemValue) AND !empty($newItemValue))
-                        $changeValue[] = Html::tag('li', '{ecommerce_' . $this->getAttributeLabel($key) . '}' . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{ecommerce_' . $key . '}' . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                     else if (empty($oldItemValue) AND !empty($newItemValue))
-                        $changeValue[] = Html::tag('li', '{create} {ecommerce_' . $this->getAttributeLabel($key) . '}: ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{create} {ecommerce_' . $key . '}: ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                     else
-                        $changeValue[] = Html::tag('li', '{' . $action . '} {ecommerce_' . $this->getAttributeLabel($key) . '}: ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{' . $action . '} {ecommerce_' . $key . '}: ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                 }
             }
         }
