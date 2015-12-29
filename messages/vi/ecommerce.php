@@ -56,4 +56,9 @@ return [
     // Begin Payment
     'Payment' => 'Phương thức thanh toán',
     // End Payent
+
+    // Begin customer
+    'Full Name' => 'Họ và tên',
+    'Address' => 'Địa chỉ',
+    // End customer
 ];

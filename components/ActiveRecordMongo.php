@@ -176,14 +176,14 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
      */
     protected function getValueAtributeArray($attribute = [], $attributeNew, $changeValue = [], $name = ''){
         // Set default value $action, $attributeLong, $attributeSmall
-        $action = 'Delete';
+        $action = 'delete';
         $attributeLong = $attribute;
         $attributeSmall = $attributeNew;
 
         // Check if length $attribute > $attributeNew then key not exits is delete. If length $attributeNew > $attribute then key not exits is add
         if (count($attribute) < count($attributeNew)){
             // Action when have key not exits in $attributeLong
-            $action = 'Create';
+            $action = 'create';
             
             // Attribute have long length
             $attributeLong = $attributeNew;
@@ -209,20 +209,20 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 $newItemValue = $itemSmallValue;
 
                 // Set old item value and new item value when $action = Delete
-                if ($action == 'Create'){
+                if ($action == 'create'){
                     $oldItemValue = $itemSmallValue;
                     $newItemValue = $items;
                 }
 
                 if ($items !== $itemSmallValue){
                     if (!empty($oldItemValue) AND empty($newItemValue))
-                        $changeValue[] = Html::tag('li', '{delete} ' . $this->getAttributeLabel($key));
+                        $changeValue[] = Html::tag('li', '{delete} ' . '{ecommerce_' . $this->getAttributeLabel($key) . '}');
                     else if (!empty($oldItemValue) AND !empty($newItemValue))
-                        $changeValue[] = Html::tag('li', $this->getAttributeLabel($key) . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{ecommerce_' . $this->getAttributeLabel($key) . '}' . $name . ' {from} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $oldItemValue))) . ' {to} ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                     else if (empty($oldItemValue) AND !empty($newItemValue))
-                        $changeValue[] = Html::tag('li', '{create} ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{create} {ecommerce_' . $this->getAttributeLabel($key) . '}: ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                     else
-                        $changeValue[] = Html::tag('li', '{' . $action . '} ' . $this->getAttributeLabel($key) . ': ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
+                        $changeValue[] = Html::tag('li', '{' . $action . '} {ecommerce_' . $this->getAttributeLabel($key) . '}: ' . Yii::t('ecommerce', ucwords(str_replace ('_', ' ', $newItemValue))));
                 }
             }
         }
