@@ -2,6 +2,8 @@
 use yii\helpers\Url;
 use yii\bootstrap\ActiveForm;
 use sya\payment\Payment;
+use yii\helpers\ArrayHelper;
+use sya\ecommerce\Module;
 sya\ecommerce\EcommerceAssets::register($this);
 
 $form = ActiveForm::begin([
@@ -114,7 +116,7 @@ $form = ActiveForm::begin([
     <div class="col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5><?= Yii::t('ecommerce', 'Status') ?></h5>
+                <h5><?= Yii::t('ecommerce', 'Status') ?>: <?php if (!$model->getIsNewRecord()): ?><span id="status_text" class="btn btn-xs btn-primary"><?= ArrayHelper::getValue(Module::$status, $model->status); ?></span><?php endif; ?></h5>
             </div>
             <div class="ibox-content">
                 <?= $this->render('_status', [

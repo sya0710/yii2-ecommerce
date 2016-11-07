@@ -187,6 +187,7 @@ class Module extends \yii\base\Module{
                 self::STATUS_COMPLETE,
                 self::STATUS_CANCEL,
                 self::STATUS_CLOSE,
+                self::STATUS_EMPTY
             ],
             self::STATUS_CLOSE => [
                 self::STATUS_NEW,
@@ -199,6 +200,7 @@ class Module extends \yii\base\Module{
                 self::STATUS_COMPLETE,
                 self::STATUS_CANCEL,
                 self::STATUS_CLOSE,
+                self::STATUS_EMPTY
             ],
             self::STATUS_COMPLETE => [
                 self::STATUS_NEW,
@@ -210,6 +212,8 @@ class Module extends \yii\base\Module{
                 self::STATUS_PAID,
                 self::STATUS_COMPLETE,
                 self::STATUS_CANCEL,
+                self::STATUS_CLOSE,
+                self::STATUS_EMPTY
             ],
         ];
 

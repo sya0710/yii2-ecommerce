@@ -106,7 +106,8 @@ class AjaxController extends \yii\web\Controller{
         $model->save();
         
         echo json_encode([
-            'status' => Module::getListStatus($model->status),
+            'arrStatus' => Module::getListStatus($model->status),
+            'status' => ArrayHelper::getValue(Module::$status, $model->status),
             'log' => $model->generateLogOrder()
         ]);
     }

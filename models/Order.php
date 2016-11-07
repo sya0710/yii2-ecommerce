@@ -99,8 +99,8 @@ class Order extends BaseOrder
 
         if (!empty($this->created_at)){
             list($minDate, $maxDate) = explode(' to ', $this->created_at);
-            $min_date = new \MongoDate(strtotime($minDate . ' 00:00:00'));
-            $max_date = new \MongoDate(strtotime($maxDate . ' 23:59:59'));
+            $min_date = strtotime($minDate . ' 00:00:00');
+            $max_date = strtotime($maxDate . ' 23:59:59');
             $query = SyaHelper::addMongoFilter($query, 'created_at', [$min_date, $max_date], 'between');
         }
 
