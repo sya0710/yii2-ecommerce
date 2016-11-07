@@ -436,7 +436,7 @@ HTML;
                     'convertFormat'=>true,
                 ],
                 'value'=>function ($model, $key, $index, $widget) {
-                    return date('d-m-Y', $model->created_at->sec);
+                    return date('d-m-Y', $model->created_at);
                 },
             ],
             [

@@ -285,10 +285,10 @@ class Order extends BaseOrder
                 
                 $template .= Html::beginTag('div', ['class' => 'feed-element']);
                     $template .= Html::beginTag('div');
-                        $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at->sec), ['class' => 'pull-right text-navy']);
+                        $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at), ['class' => 'pull-right text-navy']);
                         $template .= Html::a(Html::tag('strong', $adminName), Url::to([$linkUser, $idUser => $admin]));
                         $template .= Html::tag('div', $content);
-                        $template .= Html::tag('small', date('l h:i a \- d.m.Y', $created_at->sec));
+                        $template .= Html::tag('small', date('l h:i a \- d.m.Y', $created_at));
                     $template .= Html::endTag('div');
                 $template .= Html::endTag('div');
             endforeach;
@@ -308,7 +308,7 @@ class Order extends BaseOrder
         if (is_array($this->log) AND !empty($this->log)){
             foreach ($this->log as $log){
                 // Declare infomation log
-                $created_at = ArrayHelper::getValue($log, 'created_at');
+                $created_at = ArrayHelper::getValue($log, 'created_at', null);
                 $action = ArrayHelper::getValue($log, 'action');
                 $note = ArrayHelper::getValue($log, 'note');
                 $creator = ArrayHelper::getValue($log, 'creator');
@@ -325,9 +325,9 @@ class Order extends BaseOrder
                     $template .= Html::beginTag('div', ['class' => 'row']);
                         $template .= Html::beginTag('div', ['class' => 'col-xs-3 date']);
                             $template .= Html::tag('i', '', ['class' => 'fa ' . ArrayHelper::getValue(\sya\ecommerce\Module::$logStatus, $action)]);
-                                $template .= date('H:i a', $created_at->sec);
+                                $template .= !empty($created_at) ? date('H:i a', $created_at) : null;
                                 $template .= Html::tag('br');
-                                $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at->sec), ['class' => 'text-navy']);
+                                $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at), ['class' => 'text-navy']);
                         $template .= Html::endTag('div');
                         $template .= Html::beginTag('div', ['class' => 'col-xs-7 content no-top-border']);
                                 $template .= Html::tag('p', Html::tag('strong', Yii::t('ecommerce', ucfirst($action))), ['class' => 'm-b-xs']);

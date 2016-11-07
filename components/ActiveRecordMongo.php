@@ -4,7 +4,7 @@ namespace sya\ecommerce\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use MongoDate;
+use DateTime;
 use sya\ecommerce\Ecommerce;
 use yii\bootstrap\Html;
 
@@ -23,7 +23,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         $username = ArrayHelper::getValue($ecommerce->userTable, 'nameField');
         
         // date time
-        $now = new MongoDate();
+        $now = (new DateTime())->getTimestamp();
         if (in_array('created_at', $attributes) AND empty($this->created_at))
             $this->created_at = $now;
         if (in_array('updated_at', $attributes))
