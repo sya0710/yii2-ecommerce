@@ -13,43 +13,41 @@ use yii\web\NotFoundHttpException;
 class Component extends \yii\base\Component {
 
 	/**
-	 * @param primary key of product
-	 */
-	public $primary_key = 'id';
-
-	/**
-	 * @param title of product
-	 */
-	public $title = 'title';
-
-	/**
-	 * @param price buy of product
-	 */
-	public $price = 'price';
-
-	/**
-	 * @param special price of product
-	 */
-	public $old_price = 'old_price';
-
-	/**
 	* Function get number product had add to cart
+	* @return int
 	*/
 	public function getNumberItemCart(){
-		return Yii::$app->session->get('numberItemCart');
+		return Yii::$app->session->get('numberItemCart', 0);
 	}
 
+	/**
+	 * Function get id quote
+	 * @return string
+	 */
 	public function getCartId(){
-		return Yii::$app->session->get('quote_id');
+		return Yii::$app->session->get('quote_id', null);
+	}
+
+	/**
+	* Function get info cart
+	* @return object
+	*/
+	public function getCart(){
+		$quote_id = Quote::getQuoteId();
+
+		// Get cart info
+		$model = $this->findCart($quote_id);
+
+		return $model;
 	}
 
 	/**
 	 * Function add product to cart
-	 * @param array $product_info infomation of product $product_info[$primary_key_value] = [
-	 * 	$primary_key => '',
-	 *	$title => '',
-	 *	$price => '',
-	 *	$old_price => '',
+	 * @param array $product_info infomation of product $product_info['id'] = [
+	 * 	'id' => '',
+	 *	'title' => '',
+	 * 	'price' => '',
+	 *	'old_price' => '',
 	 *	'quantity' => 1
 	 * ]
 	 * @return bolean
@@ -58,28 +56,39 @@ class Component extends \yii\base\Component {
 		if (empty($product_info))
 			return false;
 
-		$quote_id = Quote::getQuoteId();
-
 		// Get cart info
-		$cart = $this->findCart($quote_id);
+		$cart = $this->getCart();
 
 		// Add or update item to cart
-		$update_cart = $cart->updateCart($product_info);
+		$update_cart = $cart->addCart($product_info);
 
 		return $update_cart;
 	}
 
 	/**
-	* Function get info cart
-	*/
-	public function getCart(){
-		$quote_id = Quote::getQuoteId();
+	 * Function change quantity of product
+	 * @param array $product_qty Array product and quantity $product_qty['product_id'] = 1
+	 * @return bolean
+	 */
+	public function updateQty($product_qty = []){
+		if (empty($product_qty))
+			return;
 
-		$model = $this->findCart($quote_id);
+		// Get cart info
+		$cart = $this->getCart();
 
-		return $model;
+		// Update quantity of product
+		$update_qty = $cart->updateQty($product_qty);
+
+		return $update_qty;
 	}
 
+	/**
+	 * Function change cart to order
+	 * @param  array $product_info  infomation of product
+	 * @param  array $customer_info infomation of customer
+	 * @return boolean
+	 */
 	public function createOrder($product_info, $customer_info){
 		$order = new Order;
 
@@ -100,11 +109,12 @@ class Component extends \yii\base\Component {
 		$order->customer = $customer_info;
 		$order->status = Module::STATUS_NEW;
 		$order->payment = 'pay_at_home';
+		$order->shipping = '0';
 		$saveOrder = $order->save();
 
 		if ($saveOrder){
-			Yii::$app->session->set('numberItemCart', 0);
-			Yii::$app->session->set('quote_id', null);
+			Yii::$app->session->remove('numberItemCart');
+			Yii::$app->session->remove('quote_id');
 		}
 
 		return $saveOrder;

@@ -149,16 +149,16 @@ echo Ecommerce::widget([
 ]);
 ```
 
-Component
-```
+# Component
+```php
 'cart' => [
     'class' => 'sya\ecommerce\components\Component'
 ],
 ```
 
-Use component
-```
-Add item product to cart
+# Use component
+```php
+// Add item product to cart
 $product_info = [
     '57ce373574530' => [
         'id' => '57ce373574530',
@@ -185,6 +185,19 @@ $customer_info = [
     'note_customer' => 'Done'
 ];
 Yii::$app->cart->createOrder($product_info, $customer_info);
+
+// Get id cart
+Yii::$app->cart->getCartId();
+
+// Get infomation of cart
+Yii::$app->cart->getCart();
+
+// Update quantity of product
+$product_qty = [
+    '581957637371d' => 3,
+    '57ce373574530' => 4,
+];
+Yii::$app->cart->updateQty($product_qty);
 ```
 
 ## I18n
