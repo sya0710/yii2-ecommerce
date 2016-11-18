@@ -152,12 +152,7 @@ echo Ecommerce::widget([
 Component
 ```
 'cart' => [
-    'class' => 'sya\ecommerce\components\Component',
-    // Declear column of product
-    'primary_key' => 'id',
-    'title' => 'title',
-    'price' => 'price',
-    'old_price' => 'old_price'
+    'class' => 'sya\ecommerce\components\Component'
 ],
 ```
 
@@ -185,9 +180,9 @@ Yii::$app->cart->addCart($product_info);
 
 // Create order
 $customer_info = [
-	'fullname' => 'Minion',
-	'phone' => '0123456789',
-	'note_customer' => 'Done'
+    'fullname' => 'Minion',
+    'phone' => '0123456789',
+    'note_customer' => 'Done'
 ];
 Yii::$app->cart->createOrder($product_info, $customer_info);
 ```
@@ -195,11 +190,11 @@ Yii::$app->cart->createOrder($product_info, $customer_info);
 ## I18n
 ```
 'components' => [
-	'i18n' => [
-		'translations' => [
-			'ecommerce' => ['class' => 'yii\i18n\PhpMessageSource', 'basePath' => '@syaEcommerce/messages'],
-		],
-	],
+    'i18n' => [
+        'translations' => [
+            'ecommerce' => ['class' => 'yii\i18n\PhpMessageSource', 'basePath' => '@syaEcommerce/messages'],
+        ],
+    ],
 ],
 ```
 
