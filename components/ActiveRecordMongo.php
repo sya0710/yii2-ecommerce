@@ -57,19 +57,19 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                     [
                         'content' => $this->note_admin_content,
                         'creator' => Yii::$app->user->id,
-                        'creator_name' => Yii::$app->user->identity->$username,
+                        'creator_name' => isset(Yii::$app->user->identity) ? Yii::$app->user->identity->$username : Yii::t('ecommerce', 'Customer'),
                         'created_at' => $now,
                     ]
                 ];
             } else {
-                $this->note_admin = ArrayHelper::merge($this->note_admin, [
+                $this->note_admin = ArrayHelper::merge([
                     [
                         'content' => $this->note_admin_content,
                         'creator' => Yii::$app->user->id,
-                        'creator_name' => Yii::$app->user->identity->$username,
+                        'creator_name' => isset(Yii::$app->user->identity) ? Yii::$app->user->identity->$username : Yii::t('ecommerce', 'Customer'),
                         'created_at' => $now,
                     ]
-                ]);
+                ], $this->note_admin);
             }
             $this->note_admin_content = '';
         }
@@ -137,7 +137,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 $this->log = [
                     [
                         'creator' => Yii::$app->user->id,
-                        'creator_name' => Yii::$app->user->identity->$username,
+                        'creator_name' => isset(Yii::$app->user->identity) ? Yii::$app->user->identity->$username : Yii::t('ecommerce', 'Customer'),
                         'created_at' => $now,
                         'action' => $action,
                         'note' => $this->ecommerce_id
@@ -156,7 +156,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 $this->log = ArrayHelper::merge([
                     [
                         'creator' => Yii::$app->user->id,
-                        'creator_name' => Yii::$app->user->identity->$username,
+                        'creator_name' => isset(Yii::$app->user->identity) ? Yii::$app->user->identity->$username : Yii::t('ecommerce', 'Customer'),
                         'created_at' => $now,
                         'action' => $action,
                         'note' => $note

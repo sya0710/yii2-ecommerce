@@ -55,8 +55,17 @@ class Order extends BaseOrder
     public function attributeLabels()
     {
         return array_merge(BaseOrder::attributeLabels(), [
-            'title' => Yii::t('ecommerce', 'Quote Id'),
+            'quote_id' => Yii::t('ecommerce', 'Quote Id'),
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributes()
+    {
+        $data[] = 'quote_id';
+        return array_merge(parent::attributes(), $data);
     }
 
     /**
@@ -310,7 +319,7 @@ class Order extends BaseOrder
                         $template .= Html::tag('small', Yii::$app->formatter->asRelativeTime($created_at), ['class' => 'pull-right text-navy']);
                         $template .= Html::a(Html::tag('strong', $adminName), Url::to([$linkUser, $idUser => $admin]));
                         $template .= Html::tag('div', $content);
-                        $template .= Html::tag('small', date('l h:i a \- d.m.Y', $created_at));
+                        $template .= Html::tag('small', date('l h:i:s a \- d.m.Y', $created_at));
                     $template .= Html::endTag('div');
                 $template .= Html::endTag('div');
             endforeach;

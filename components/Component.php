@@ -90,6 +90,9 @@ class Component extends \yii\base\Component {
 	 * @return boolean
 	 */
 	public function createOrder($product_info, $customer_info){
+		if (empty($product_info))
+			return false;
+
 		$order = new Order;
 
 		$product_text = [];
@@ -110,6 +113,7 @@ class Component extends \yii\base\Component {
 		$order->status = Module::STATUS_NEW;
 		$order->payment = 'pay_at_home';
 		$order->shipping = '0';
+		$order->quote_id = $this->getCartId();
 		$saveOrder = $order->save();
 
 		if ($saveOrder){
