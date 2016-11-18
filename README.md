@@ -163,24 +163,33 @@ Component
 
 Use component
 ```
+Add item product to cart
 $product_info = [
     '57ce373574530' => [
-        Yii::$app->cart->primary_key => '57ce373574530',
-        Yii::$app->cart->title => '213213123213',
-        Yii::$app->cart->price => '25000',
-        Yii::$app->cart->old_price => '0',
+        'id' => '57ce373574530',
+        'title' => '213213123213',
+        'price' => '25000',
+        'old_price' => '0',
         'quantity' => 3
     ],
     '581957637371d' => [
-        Yii::$app->cart->primary_key => '581957637371d',
-        Yii::$app->cart->title => 'rrrrrr123',
-        Yii::$app->cart->price => '200000',
-        Yii::$app->cart->old_price => '0',
+        'id' => '581957637371d',
+        'title' => 'rrrrrr123',
+        'price' => '200000',
+        'old_price' => '0',
         'quantity' => 5
     ],
 ];
 
 Yii::$app->cart->addCart($product_info);
+
+// Create order
+$customer_info = [
+	'fullname' => 'Minion',
+	'phone' => '0123456789',
+	'note_customer' => 'Done'
+];
+Yii::$app->cart->createOrder($product_info, $customer_info);
 ```
 
 ## I18n
