@@ -60,5 +60,6 @@ return [
     // Begin customer
     'Full Name' => 'Họ và tên',
     'Address' => 'Địa chỉ',
+    'Phone' => 'Số điện thoại',
     // End customer
 ];

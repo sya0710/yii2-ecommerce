@@ -39,11 +39,11 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
                 $this->_id = uniqid();
 
             // ecommerce_id
-            if (empty($this->ecommerce_id))
+            if (in_array('ecommerce_id', $attributes) AND empty($this->ecommerce_id))
                 $this->ecommerce_id = uniqid('EM');
 
             // status
-            if (empty($this->status))
+            if (in_array('status', $attributes) AND empty($this->status))
                 $this->status = $ecommerce::STATUS_NEW;
         }
         

@@ -34,6 +34,7 @@ use sya\ecommerce\helpers\SyaHelper;
  * @property mixed $note_admin
  * @property mixed $note_admin_content
  * @property mixed $log
+ * @property mixed $quote_id
  */
 class Order extends BaseOrder
 {
@@ -51,12 +52,33 @@ class Order extends BaseOrder
     /**
      * @inheritdoc
      */
+    public function attributeLabels()
+    {
+        return array_merge(BaseOrder::attributeLabels(), [
+            'title' => Yii::t('ecommerce', 'Quote Id'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        $data = [
+            [['quote_id'], 'safe']
+        ];
+        return array_merge(parent::rules(), $data);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function scenarios()
     {
         return array_merge(Model::scenarios(), [
             'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
-            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
-            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log', 'quote_id'],
+            'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log', 'quote_id'],
         ]);
     }
     
