@@ -52,7 +52,7 @@ class ActiveRecordMongo extends \yii\mongodb\ActiveRecord {
         
         // Note admin
         if (in_array('note_admin', $attributes) AND in_array('note_admin_content', $attributes) AND !empty($this->note_admin_content)){
-            if ($this->isNewRecord) {
+            if ($this->isNewRecord OR empty($this->note_admin)) {
                 $this->note_admin = [
                     [
                         'content' => $this->note_admin_content,
