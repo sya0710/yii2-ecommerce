@@ -44,6 +44,7 @@ return [
     'Total' => 'Tổng tiền',
     'Product Text' => 'Sản phẩm',
     'Created At' => 'Ngày tạo',
+    'Infomation Product' => 'Thông tin sản phẩm',
     // End Infomation product
 
     // Begin Infomation product

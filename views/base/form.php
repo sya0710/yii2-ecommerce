@@ -43,7 +43,7 @@ $form = ActiveForm::begin([
     <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5><?= Yii::t('product', 'Infomation Product') ?></h5>
+                <h5><?= Yii::t('ecommerce', 'Infomation Product') ?></h5>
                 <div class="ibox-tools">
                     <?= $this->render('_product',[
                         'productSearchModel' => $productSearchModel,
@@ -90,7 +90,24 @@ $form = ActiveForm::begin([
                 <h5><?= Yii::t('ecommerce', 'Payment') ?></h5>
             </div>
             <div class="ibox-content">
-                <?= $form->field($model, 'payment', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->label(false)->widget(Payment::className(), []); ?>
+                <?= $form->field($model, 'payment', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->label(false)->widget(Payment::className(), [
+                    'columns' => [
+                        Payment::STATUS_TRANSFER => [
+                            'sotk' => [
+                                'placeholder' => 'Số tài khoản'
+                            ],
+                            'nametk' => [
+                                'placeholder' => 'Tên tài khoản'
+                            ],
+                            'bank' => [
+                                'placeholder' => 'Ngân hàng'
+                            ],
+                            'content' => [
+                                'placeholder' => 'Nội dung'
+                            ],
+                        ]
+                    ]
+                ]); ?>
             </div>
         </div>
     </div>
