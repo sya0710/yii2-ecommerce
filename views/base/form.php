@@ -94,16 +94,20 @@ $form = ActiveForm::begin([
                     'columns' => [
                         Payment::STATUS_TRANSFER => [
                             'sotk' => [
-                                'placeholder' => 'Số tài khoản'
+                                'placeholder' => 'Số tài khoản',
+                                'value' => '0491001556759'
                             ],
                             'nametk' => [
-                                'placeholder' => 'Tên tài khoản'
+                                'placeholder' => 'Tên tài khoản',
+                                'value' => 'Công ty cổ phần Học viện iNET'
                             ],
                             'bank' => [
-                                'placeholder' => 'Ngân hàng'
+                                'placeholder' => 'Ngân hàng',
+                                'value' => 'Vietcombank - chi nhánh Thăng Long, Hà Nội'
                             ],
                             'content' => [
-                                'placeholder' => 'Nội dung'
+                                'placeholder' => 'Nội dung',
+                                'value' => 'Thanh toán đơn hàng 40084 - Unica.vn - 0982688785'
                             ],
                         ]
                     ]

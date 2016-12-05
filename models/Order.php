@@ -161,6 +161,7 @@ class Order extends BaseOrder
             // Get model name of product
             $ecommerce = Ecommerce::module();
             $modelName = end(explode('\\', $ecommerce->itemModule));
+            $columnProduct = ArrayHelper::getValue($ecommerce->productTable, 'fieldOrder');
 
             // Begin list product order
             $template = Html::beginTag('div', ['class' => 'table-responsive']);
@@ -172,15 +173,11 @@ class Order extends BaseOrder
                             $template .= Html::beginTag('th');
                                 $template .= Yii::t('ecommerce', 'ID');
                             $template .= Html::endTag('th');
-                            $template .= Html::beginTag('th');
-                                $template .= Yii::t('ecommerce', 'Sku');
-                            $template .= Html::endTag('th');
-                            $template .= Html::beginTag('th');
-                                $template .= Yii::t('ecommerce', 'Title');
-                            $template .= Html::endTag('th');
-                            $template .= Html::beginTag('th');
-                                $template .= Yii::t('ecommerce', 'Price');
-                            $template .= Html::endTag('th');
+                            foreach ($columnProduct as $column => $item) {
+                                $template .= Html::beginTag('th');
+                                    $template .= Yii::t('ecommerce', ucfirst($column));
+                                $template .= Html::endTag('th');
+                            }
                             $template .= Html::beginTag('th');
                                 $template .= Yii::t('ecommerce', 'Quantity');
                             $template .= Html::endTag('th');
@@ -210,18 +207,18 @@ class Order extends BaseOrder
                                     $template .= Html::tag('span', $id, ['class' => 'product_id']);
                                     $template .= Html::hiddenInput($modelName . '[product][' . $id . '][id]', $id, ['class' => 'form-control', 'readonly' => true]);
                                 $template .= Html::endTag('td');
-                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                    $template .= $sku;
-                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][sku]', $sku, ['class' => 'form-control', 'readonly' => true]);
-                                $template .= Html::endTag('td');
-                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                    $template .= $title;
-                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][title]', $title, ['class' => 'form-control', 'readonly' => true]);
-                                $template .= Html::endTag('td');
-                                $template .= Html::beginTag('td', ['class' => 'text-vertical']);
-                                    $template .= Yii::$app->formatter->asDecimal($price, 0) . ' VNĐ';
-                                    $template .= Html::hiddenInput($modelName . '[product][' . $id . '][price]', $price, ['class' => 'form-control product_price', 'readonly' => true]);
-                                $template .= Html::endTag('td');
+                                foreach ($columnProduct as $column => $item) {
+                                    $template .= Html::beginTag('td', ['class' => 'text-vertical']);
+                                        $value = $valueColumn = ArrayHelper::getValue($product, $column, '');
+                                        if ('price' == $column){
+                                            $value = ArrayHelper::getValue($product, $column, 0);
+                                            $valueColumn = Yii::$app->formatter->asDecimal($value, 0) . ' VNĐ';
+                                        }
+
+                                        $template .= $valueColumn;
+                                        $template .= Html::hiddenInput($modelName . '[product][' . $id . '][' . $column . ']', $value, ['class' => 'form-control', 'readonly' => true]);
+                                    $template .= Html::endTag('td');
+                                }
                                 $template .= Html::beginTag('td', ['style' => 'width: 5%;']);
                                     $template .= Html::textInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty text-center', 'onkeyup' => 'return totalPriceProduct(this);']);
                                 $template .= Html::endTag('td');
@@ -233,7 +230,7 @@ class Order extends BaseOrder
                         
                         // Begin shipping
                         $template .= Html::beginTag('tr');
-                            $template .= Html::beginTag('td', ['colspan' => '5', 'class' => 'text-right', 'style' => 'vertical-align: middle;']);
+                            $template .= Html::beginTag('td', ['colspan' => count($columnProduct) + 2, 'class' => 'text-right', 'style' => 'vertical-align: middle;']);
                                 $template .= Yii::t('ecommerce', 'Shipping') . ': ';
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['width' => '100px']);
@@ -248,7 +245,7 @@ class Order extends BaseOrder
                         
                         // Begin total product
                         $template .= Html::beginTag('tr');
-                            $template .= Html::beginTag('td', ['colspan' => '5', 'class' => 'text-right']);
+                            $template .= Html::beginTag('td', ['colspan' => count($columnProduct) + 2, 'class' => 'text-right']);
                                 $template .= Yii::t('ecommerce', 'Total') . ': ';
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['colspan' => '2']);
