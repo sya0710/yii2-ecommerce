@@ -81,6 +81,16 @@ use sya\gallery\Module;
 ]
 ```
 
+#Allow chose add one product or multiple product
+```php
+'multiple' => false,
+```
+
+#Enable generate activation code
+```php
+'enableActivitionCode' => true,
+```
+
 ## Demo
 
 Controller
