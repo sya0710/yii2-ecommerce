@@ -3,19 +3,6 @@ use yii\bootstrap\Modal;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\Html;
-
-// Declare column in product
-$defaultColumns = [
-    [
-        'attribute' => '_id',
-        'hAlign'=>'center',
-        'vAlign'=>'middle',
-        'contentOptions' => [
-            'class' => 'customerId'
-        ]
-    ],
-];
-$customerColumns = ArrayHelper::merge($defaultColumns, $customerColumns);
     
 Modal::begin([
     'id' => 'customer_modal',

@@ -3,6 +3,9 @@ use yii\bootstrap\Modal;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\Html;
+use sya\ecommerce\Ecommerce;
+
+$ecommerce = Ecommerce::module();
 
 // Declare column in product
 $defaultColumns = [
@@ -24,8 +27,14 @@ $productColumns[] = [
     'contentOptions' => [
         'class' => 'productQty'
     ],
-    'value'=>function ($model, $key, $index, $widget) { 
-        return Html::textInput('qty', 0, ['class' => 'form-control qty_' . $model->_id, 'onkeyup' => 'return productQtyOrder(this);']);
+    'value'=>function ($model, $key, $index, $widget) use ($ecommerce) {
+        $options = ['class' => 'form-control qty_' . $model->_id];
+        if ($ecommerce->multiple)
+            $options['onkeyup'] = 'return productQtyOrder(this);';
+        else
+            $options['readonly'] = '';
+
+        return Html::textInput('qty', 1, $options);
     },
     'format'=>'raw',
 ];

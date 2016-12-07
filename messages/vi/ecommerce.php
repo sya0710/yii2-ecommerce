@@ -45,6 +45,7 @@ return [
     'Product Text' => 'Sản phẩm',
     'Created At' => 'Ngày tạo',
     'Infomation Product' => 'Thông tin sản phẩm',
+    'Activation Code' => 'Mã kích hoạt',
     // End Infomation product
 
     // Begin Infomation product

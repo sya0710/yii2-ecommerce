@@ -52,6 +52,65 @@ class Order extends BaseOrder
     /**
      * @inheritdoc
      */
+    public function beforeSave($insert) {
+        $attributes = array_keys($this->getAttributes());
+
+        // Begin generate code active product
+        $activation_code = $this->_checkCode();
+
+        if (!empty($activation_code)) {
+            foreach ($activation_code as $product_id_activation => $code_activation) {
+                $code_order = new ActivationCode;
+                $code_order->code = $code_activation;
+                $code_order->product_id = $product_id_activation;
+                $code_order->user_id = ArrayHelper::getValue($this->customer, 'id');
+                $code_order->order_id = $this->_id;
+                $code_order->status_code = "0";
+                $code_order->save();
+            }
+        }
+        // End generate code active product
+
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     * Function generate code active product
+     * @param  array  $activation_code Array code and product
+     * @return array  Array code and product
+     */
+    private function _checkCode($activation_code = []){
+        // Get model name of product
+        $ecommerce = Ecommerce::module();
+
+        if (!$ecommerce->enableActivitionCode)
+            return [];
+
+        $user_id = ArrayHelper::getValue($this->customer, 'id');
+
+        foreach ($this->product as $product_id => $item) {
+            $activation_code[$product_id] = substr(md5("order".uniqid().$user_id.$this->_id.$product_id), 0, 12);
+        }
+
+        // Get all code for product_id had generate
+        $arrCode = array_values($activation_code);
+
+        // Check code exits
+        $codes = ActivationCode::find()->select(['code', 'product_id'])->where(['code' => $arrCode])->all();
+
+        if (!empty($codes)) {
+            foreach ($codes as $item_code) {
+                unset($activation_code[$item_code['product_id']]);
+                $activation_code += $this->_checkCode($activation_code);
+            }
+        }
+
+        return $activation_code;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return array_merge(BaseOrder::attributeLabels(), [
@@ -178,12 +237,19 @@ class Order extends BaseOrder
                                     $template .= Yii::t('ecommerce', ucfirst($column));
                                 $template .= Html::endTag('th');
                             }
+
                             $template .= Html::beginTag('th');
                                 $template .= Yii::t('ecommerce', 'Quantity');
                             $template .= Html::endTag('th');
-                            $template .= Html::beginTag('th');
+                            $template .= Html::beginTag('th', ['colspan' => 2]);
                                 $template .= Yii::t('ecommerce', 'Total Price');
                             $template .= Html::endTag('th');
+
+                            if ($ecommerce->enableActivitionCode){
+                                $template .= Html::beginTag('th');
+                                    $template .= Yii::t('ecommerce', 'Activation Code');
+                                $template .= Html::endTag('th');
+                            }
                         $template .= Html::endTag('tr');
                     $template .= Html::endTag('thead');
                 // End header table
@@ -197,8 +263,9 @@ class Order extends BaseOrder
                             $sku = ArrayHelper::getValue($product, 'sku', '');
                             $title = ArrayHelper::getValue($product, 'title', '');
                             $price = ArrayHelper::getValue($product, 'price', 0);
-                            $quantity = ArrayHelper::getValue($product, 'quantity', 0);
+                            $quantity = ArrayHelper::getValue($product, 'quantity', 1);
                             $is_marketing = ArrayHelper::getValue($product, 'is_marketing', '1');
+                            $activationCode = ActivationCode::find()->select(['code'])->where(['product_id' => $id, 'order_id' => Yii::$app->request->get('id')])->one();
                             $total = $price * $quantity;
                             $sumTotal += $total; 
 
@@ -219,18 +286,36 @@ class Order extends BaseOrder
                                         $template .= Html::hiddenInput($modelName . '[product][' . $id . '][' . $column . ']', $value, ['class' => 'form-control', 'readonly' => true]);
                                     $template .= Html::endTag('td');
                                 }
+                                
                                 $template .= Html::beginTag('td', ['style' => 'width: 5%;']);
-                                    $template .= Html::textInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty text-center', 'onkeyup' => 'return totalPriceProduct(this);']);
+                                    if ($ecommerce->multiple){
+                                        $template .= Html::textInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty text-center', 'onkeyup' => 'return totalPriceProduct(this);']);
+                                    } else {
+                                        $template .= $quantity;
+                                        $template .= Html::hiddenInput($modelName . '[product][' . $id . '][quantity]', $quantity, ['class' => 'form-control product_qty text-center', 'onkeyup' => 'return totalPriceProduct(this);']);
+                                    }
                                 $template .= Html::endTag('td');
+
                                 $template .= Html::beginTag('td', ['class' => 'text-vertical', 'colspan' => 2]);
                                     $template .= Html::tag('span', Yii::$app->formatter->asDecimal($total, 0) . ' VNĐ', ['class' => 'product_total', 'data-total' => $total]);
                                 $template .= Html::endTag('td');
+
+                                if ($ecommerce->enableActivitionCode){
+                                    $template .= Html::beginTag('td', ['class' => 'text-vertical']);
+                                        $template .= ArrayHelper::getValue($activationCode, 'code', null);
+                                    $template .= Html::endTag('td');
+                                }
                             $template .= Html::endTag('tr');
+                        }
+
+                        $colspan = count($columnProduct) + 3;
+                        if (!$ecommerce->enableActivitionCode){
+                            $colspan = count($columnProduct) + 2;
                         }
                         
                         // Begin shipping
                         $template .= Html::beginTag('tr');
-                            $template .= Html::beginTag('td', ['colspan' => count($columnProduct) + 2, 'class' => 'text-right', 'style' => 'vertical-align: middle;']);
+                            $template .= Html::beginTag('td', ['colspan' => $colspan, 'class' => 'text-right', 'style' => 'vertical-align: middle;']);
                                 $template .= Yii::t('ecommerce', 'Shipping') . ': ';
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['width' => '100px']);
@@ -245,7 +330,7 @@ class Order extends BaseOrder
                         
                         // Begin total product
                         $template .= Html::beginTag('tr');
-                            $template .= Html::beginTag('td', ['colspan' => count($columnProduct) + 2, 'class' => 'text-right']);
+                            $template .= Html::beginTag('td', ['colspan' => $colspan, 'class' => 'text-right']);
                                 $template .= Yii::t('ecommerce', 'Total') . ': ';
                             $template .= Html::endTag('td');
                             $template .= Html::beginTag('td', ['colspan' => '2']);
@@ -411,5 +496,9 @@ class Order extends BaseOrder
         }
 
         return preg_replace($patterns, $replace, $note);
+    }
+
+    public function checkQuantityProductOrder() {
+
     }
 }

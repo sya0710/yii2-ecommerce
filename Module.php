@@ -62,6 +62,13 @@ class Module extends \yii\base\Module{
      * @var array product config in your table product
      */
     public $productTable = [];
+
+    /**
+     * @var boolean allow order quantity of product or order one product
+     */
+    public $multiple = true;
+
+    public $enableActivitionCode = false;
     
     /**
      * @var array User infomation in your table user
