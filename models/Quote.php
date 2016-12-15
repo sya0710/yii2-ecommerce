@@ -5,6 +5,7 @@ namespace sya\ecommerce\models;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use sya\ecommerce\Ecommerce;
 
 /**
  * This is the model class for collection "quote".
@@ -47,6 +48,8 @@ class Quote extends BaseQuote
         if (empty($product_info))
             return false;
 
+        $ecommerce = Ecommerce::module();
+
         $arrProduct = !empty($this->product) ? $this->product : [];
         if (!empty($arrProduct)){
             // Get id of product add to cart
@@ -54,7 +57,7 @@ class Quote extends BaseQuote
 
             foreach ($arrProduct as $id => $info) {
                 // Check product had cart
-                if (in_array($id, $arrIdProduct)) {
+                if (in_array($id, $arrIdProduct) AND $ecommerce->multiple) {
                     // Qty of product add to cart
                     $qty_product_add = (int) ArrayHelper::getValue($product_info, $id . '.quantity', 1);
 
