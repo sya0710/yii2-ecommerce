@@ -379,7 +379,7 @@ HTML;
                 'headerOptions'=>['class'=>'kartik-sheet-style']
             ],
             [
-                'attribute' => '_id',
+                'attribute' => 'quote_id',
                 'hAlign'=>'center',
                 'vAlign'=>'middle',
             ],

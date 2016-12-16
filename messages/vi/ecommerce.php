@@ -8,6 +8,7 @@ return [
     'Back' => 'Quay lại',
     'Product' => 'Sản phẩm',
     'Quantity' => 'Số lượng',
+    'Quote Id' => 'Số đơn hàng',
 
     // Begin Status order
     'New' => 'Đơn hàng mới',

@@ -4,7 +4,10 @@ use yii\bootstrap\ActiveForm;
 use sya\payment\Payment;
 use yii\helpers\ArrayHelper;
 use sya\ecommerce\Module;
+use sya\ecommerce\Ecommerce;
 sya\ecommerce\EcommerceAssets::register($this);
+
+$ecommerce = Ecommerce::module();
 
 $form = ActiveForm::begin([
     'id' => 'formDefault',
@@ -51,6 +54,7 @@ $form = ActiveForm::begin([
                         'productColumns' => $productColumns,
                         'form' => $form,
                         'model' => $model,
+                        'ecommerce' => $ecommerce
                     ]); ?>
                 </div>
             </div>
@@ -90,28 +94,7 @@ $form = ActiveForm::begin([
                 <h5><?= Yii::t('ecommerce', 'Payment') ?></h5>
             </div>
             <div class="ibox-content">
-                <?= $form->field($model, 'payment', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->label(false)->widget(Payment::className(), [
-                    'columns' => [
-                        Payment::STATUS_TRANSFER => [
-                            'sotk' => [
-                                'placeholder' => 'Số tài khoản',
-                                'value' => '0491001556759'
-                            ],
-                            'nametk' => [
-                                'placeholder' => 'Tên tài khoản',
-                                'value' => 'Công ty cổ phần Học viện iNET'
-                            ],
-                            'bank' => [
-                                'placeholder' => 'Ngân hàng',
-                                'value' => 'Vietcombank - chi nhánh Thăng Long, Hà Nội'
-                            ],
-                            'content' => [
-                                'placeholder' => 'Nội dung',
-                                'value' => 'Thanh toán đơn hàng 40084 - Unica.vn - 0982688785'
-                            ],
-                        ]
-                    ]
-                ]); ?>
+                <?= $form->field($model, 'payment', ['horizontalCssClasses' => ['wrapper' => 'col-sm-12']])->label(false)->widget(Payment::className(), $ecommerce->paymentConfig); ?>
             </div>
         </div>
     </div>

@@ -83,6 +83,11 @@ class Module extends \yii\base\Module{
      * @var array customer config in your table customer
      */
     public $customerTable = [];
+
+    /**
+     * @var array customer config in your table customer
+     */
+    public $paymentConfig = [];
     
     /**
      * @inherit doc

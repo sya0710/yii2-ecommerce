@@ -52,18 +52,20 @@ class Order extends BaseOrder
     /**
      * @inheritdoc
      */
-    public function beforeSave($insert) {
+    public function afterSave($insert, $changedAttributes) {
         $attributes = array_keys($this->getAttributes());
 
         // Begin generate code active product
         $activation_code = $this->_checkCode();
+
+        $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : ArrayHelper::getValue($this->customer, 'id');
 
         if (!empty($activation_code)) {
             foreach ($activation_code as $product_id_activation => $code_activation) {
                 $code_order = new ActivationCode;
                 $code_order->code = $code_activation;
                 $code_order->product_id = $product_id_activation;
-                $code_order->user_id = ArrayHelper::getValue($this->customer, 'id');
+                $code_order->user_id = $user_id;
                 $code_order->order_id = $this->_id;
                 $code_order->status_code = "0";
                 $code_order->save();
@@ -71,7 +73,7 @@ class Order extends BaseOrder
         }
         // End generate code active product
 
-        return parent::beforeSave($insert);
+        return parent::afterSave($insert, $changedAttributes);
     }
 
     /**
@@ -144,7 +146,7 @@ class Order extends BaseOrder
     public function scenarios()
     {
         return array_merge(Model::scenarios(), [
-            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log'],
+            'search' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'quote_id', 'log'],
             'default' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log', 'quote_id'],
             'create' => ['ecommerce_id', 'creator', 'created_at', 'updater', 'updated_at', 'status', 'product', 'product_text', 'shipping', 'customer', 'payment', 'note_customer', 'note_admin', 'note_admin_content', 'log', 'quote_id'],
         ]);
@@ -186,6 +188,7 @@ class Order extends BaseOrder
         $query = SyaHelper::addMongoFilter($query, 'status', $this->status);
         $query = SyaHelper::addMongoFilter($query, 'customer', $this->customer, 'or', $customerField);
         $query = SyaHelper::addMongoFilter($query, 'product_text', $this->product_text, 'like', $customerField);
+        $query = SyaHelper::addMongoFilter($query, 'quote_id', $this->quote_id, 'like');
 
         if (!empty($this->created_at)){
             list($minDate, $maxDate) = explode(' to ', $this->created_at);

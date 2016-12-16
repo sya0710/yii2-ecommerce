@@ -3,9 +3,6 @@ use yii\bootstrap\Modal;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\Html;
-use sya\ecommerce\Ecommerce;
-
-$ecommerce = Ecommerce::module();
 
 // Declare column in product
 $defaultColumns = [

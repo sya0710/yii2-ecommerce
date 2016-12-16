@@ -87,9 +87,10 @@ class Component extends \yii\base\Component {
 	 * Function change cart to order
 	 * @param  array $product_info  infomation of product
 	 * @param  array $customer_info infomation of customer
+	 * @param  array $payment_info infomation of payment
 	 * @return boolean
 	 */
-	public function createOrder($product_info, $customer_info){
+	public function createOrder($product_info, $customer_info, $payment_info = []){
 		if (empty($product_info))
 			return false;
 
@@ -111,7 +112,15 @@ class Component extends \yii\base\Component {
 
 		$order->customer = $customer_info;
 		$order->status = Module::STATUS_NEW;
-		$order->payment = 'pay_at_home';
+
+		if (empty($payment_info))
+			$order->payment = ['status' => Payment::STATUS_PAYATHOME];
+		else {
+			$payment['status'] = ArrayHelper::getValue($payment_info, 'status');
+			$payment['infomation'] = ArrayHelper::getValue($payment_info, 'infomation');
+			$order->payment = $payment;
+		}
+
 		$order->shipping = '0';
 		$order->quote_id = $this->getCartId();
 		$saveOrder = $order->save();
