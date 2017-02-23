@@ -111,7 +111,11 @@ class Module extends \yii\base\Module{
         $this->itemSettings['itemSettings']['actions'] = $actions;
         
         // Setup params status
-        self::$status = [
+        self::getStatus();
+    }
+
+    public static function getStatus(){
+        return self::$status = [
             self::STATUS_EMPTY => Yii::t('ecommerce', '-- Chose Status --'),
             self::STATUS_NEW => Yii::t('ecommerce', 'New'),
             self::STATUS_PROCESS => Yii::t('ecommerce', 'Processing'),
